@@ -1,0 +1,25 @@
+{
+  "chain": "sprouts",
+  "ok": true,
+  "at": "2026-10-23T20:29:02.987Z",
+  "runner": "windows",
+  "items": 57,
+  "active": 57,
+  "upcoming": 0,
+  "priced": 25,
+  "ads": [
+    {
+      "id": "21432087034009936",
+      "name": "Weekly Ad (weekly)",
+      "valid_from": "2026-10-21",
+      "valid_to": "2026-10-27"
+    },
+    {
+      "id": "21217165535019568",
+      "name": "Monthly Ad (monthly)",
+      "valid_from": "2026-09-22",
+      "valid_to": "2026-10-27"
+    }
+  ],
+  "last_error": null
+}
