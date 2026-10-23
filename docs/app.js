@@ -150,7 +150,7 @@ function renderTotal(analyses) {
   const missing = est.count - est.priced;
   $('#totalNote').textContent = missing
     ? `Lowest price for ${est.priced} of ${est.count} items. ${missing} ${missing > 1 ? "don't have" : "doesn't have"} a listed price yet.`
-    : `Lowest price for all ${est.count} items, mixing stores.`;
+    : est.count === 1 ? 'Lowest price nearby.' : `Lowest price for all ${est.count} items, mixing stores.`;
   const trips = oneStopTrips(analyses, state.list);
   $('#tripPanel').innerHTML = trips.length
     ? trips.map((t) => {
