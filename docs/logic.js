@@ -38,7 +38,7 @@ export function tokens(s) {
 }
 
 // Words that end a name without being the thing itself ("Milk Half gallon", "Thighs Value Pack").
-const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', 'pack', 'value', 'family', 'size', 'bag', 'box', 'bottle', 'jar', 'can', 'carton', 'dozen', 'large', 'small', 'medium', 'organic', 'fresh', 'frozen', 'pk', 'each', 'ea', 'roll', 'mega', 'triple', 'double',
+const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', 'pack', 'value', 'family', 'size', 'bag', 'box', 'bottle', 'jar', 'can', 'carton', 'tub', 'clamshell', 'container', 'pouch', 'sleeve', 'tray', 'bunch', 'dozen', 'large', 'small', 'medium', 'organic', 'fresh', 'frozen', 'pk', 'each', 'ea', 'roll', 'mega', 'triple', 'double',
   // Cut/form words: "Walnut Halves & Pieces" is walnuts, "Pineapple Chunks" is pineapple.
   'halve', 'piece', 'slice', 'chunk', 'floret', 'bit', 'wedge', 'sliver', 'spear', 'baking']);
 
@@ -318,9 +318,27 @@ export function analyzeEntry(items, entry, today) {
   return { active, upcoming, perChain, best, pinned, chosen, soon };
 }
 
+/**
+ * What `qty` units actually cost. Multi-buy deals ("Buy 1, get 1 50% off") only
+ * kick in for full groups: 1 unit pays the single price, 2 get the deal.
+ */
 export function lineCost(item, qty) {
   if (!item || item.price == null) return null;
+  const p = item.promo;
+  if (p && item.regular_price) {
+    const unit = item.regular_price;
+    const group = p.buy + p.get;
+    const groups = Math.floor(qty / group);
+    const rest = qty - groups * group;
+    const cost = groups * (p.buy * unit + p.get * unit * (1 - p.pct / 100)) + rest * unit;
+    return Math.round(cost * 100) / 100;
+  }
   return Math.round(item.price * qty * 100) / 100;
+}
+
+/** Short text for a multi-buy deal's requirement, e.g. "when you buy 2". */
+export function dealQtyText(item) {
+  return item?.promo ? `when you buy ${item.promo.buy + item.promo.get}` : '';
 }
 
 /** Total of the cheapest choice for each entry. */

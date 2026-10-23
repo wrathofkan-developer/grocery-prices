@@ -1,7 +1,7 @@
 import {
   CHAINS, todayPT, priceStatus, indexItem, analyzeEntry, estimate, oneStopTrips,
   nearestStore, miles, money, unitLabel, dayLabel, rangeLabel, ago, tokens, matches, compareValue,
-  suggest, shortName,
+  suggest, shortName, dealQtyText,
 } from './logic.js';
 
 const DEFAULT_HERE = { lat: 37.6547, lng: -122.4508, label: 'Near South SF' };
@@ -61,10 +61,22 @@ function priceTag(item) {
   const sale = item.kind === 'sale';
   const per = item.price_per === 'lb' ? '<small>/lb</small>' : '';
   const unit = item.price_per === 'lb' ? '' : unitLabel(item.unit_price);
+  // Deal items show the price after the deal, plus one unit before it.
+  let before = '';
+  if (item.regular_price) {
+    const lb = item.price_per === 'lb' ? '/lb' : '';
+    before = item.promo
+      ? `<span class="tag-single">${money(item.regular_price)}${lb} for 1</span>`
+      : `<span class="tag-before">Was ${money(item.regular_price)}${lb}</span>`;
+  }
+  const kind = item.promo ? esc(item.deal_text)
+    : item.regular_price && item.deal_text ? `${esc(item.deal_text)}`
+    : sale ? (item.member_price ? 'Member sale' : 'Sale') : 'Shelf price';
   return `<div class="tag${sale ? ' sale' : ''}">
     <span class="tag-price">${money(item.price)}${per}</span>
-    ${unit ? `<span class="tag-unit">${unit}</span>` : ''}
-    <span class="tag-kind">${sale ? (item.member_price ? 'Member sale' : 'Sale') : 'Shelf price'}</span>
+    ${item.promo ? `<span class="tag-unit">each ${dealQtyText(item)}</span>` : unit ? `<span class="tag-unit">${unit}</span>` : ''}
+    ${before}
+    <span class="tag-kind">${kind}</span>
   </div>`;
 }
 

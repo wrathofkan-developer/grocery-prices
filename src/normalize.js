@@ -75,6 +75,26 @@ export function parsePrice(text) {
   return null;
 }
 
+/**
+ * Multi-buy deals from a label: "Buy 1, get 1 free", "Buy 1, get 1 50% off",
+ * "Buy 2 get 1 free". Returns { buy, get, pct } (pct = % off the "get" units)
+ * or null for anything else (e.g. "35% off", which is already in the price).
+ */
+export function parseMultiBuy(label) {
+  const m = String(label || '').match(/buy\s*(\d+),?\s*get\s*(\d+)\s*(free|(\d+)\s*%\s*off)/i);
+  if (!m) return null;
+  return { buy: Number(m[1]), get: Number(m[2]), pct: m[3].toLowerCase() === 'free' ? 100 : Number(m[4]) };
+}
+
+/** Exact cost of `qty` units under a multi-buy deal, at single-unit price `unit`. */
+export function multiBuyCost(unit, qty, promo) {
+  if (!promo) return unit * qty;
+  const group = promo.buy + promo.get;
+  const groups = Math.floor(qty / group);
+  const rest = qty - groups * group;
+  return groups * (promo.buy * unit + promo.get * unit * (1 - promo.pct / 100)) + rest * unit;
+}
+
 export function round2(n) {
   return Math.round(n * 100) / 100;
 }

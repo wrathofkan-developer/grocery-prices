@@ -113,7 +113,9 @@ main { max-width: 640px; margin: 0 auto; padding: 16px; }
 .tag-price { font: 700 26px/1 var(--num); letter-spacing: .2px; }
 .tag-price small { font-size: 15px; font-weight: 600; margin-left: 1px; }
 .tag-unit { font: 500 13px/1.2 var(--num); opacity: .78; margin-top: 2px; }
-.tag-kind { font: 600 12px/1.2 var(--body); margin-top: 3px; }
+.tag-kind { font: 600 12px/1.2 var(--body); margin-top: 3px; max-width: 130px; text-align: right; }
+.tag-before, .tag-single { font: 500 13px/1.2 var(--num); margin-top: 2px; opacity: .8; }
+.tag-before { text-decoration: line-through; }
 .tag.none { color: var(--muted); }
 .tag.none .tag-price { font-size: 17px; font-weight: 600; }
 
