@@ -4,9 +4,9 @@ A phone-first web app for the South San Francisco / Daly City area. Add items to
 
 | Store | What we get | Where it runs |
 |---|---|---|
-| Safeway (Westlake, Gellert, El Camino, Hickey) | Weekly ad, Wed–Tue, via Flipp | GitHub, twice daily |
-| Trader Joe's (Daly City, South SF, Millbrae) | Everyday shelf prices per store, ~1,460 food items | GitHub, twice daily |
-| Costco (South SF #422) | Monthly member savings book | GitHub, twice daily |
+| Safeway (Westlake, Gellert, El Camino, Hickey) | Weekly ad, Wed–Tue, via Flipp | GitHub, just after midnight |
+| Trader Joe's (Daly City, South SF, Millbrae) | Everyday shelf prices per store, ~1,460 food items | GitHub, just after midnight |
+| Costco (South SF #422) | Monthly member savings book | GitHub, just after midnight |
 | Sprouts (Daly City #276) | Weekly and monthly ads | Your Windows PC (needs a real browser) |
 
 ## Effective dates

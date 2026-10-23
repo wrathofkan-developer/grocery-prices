@@ -1,12 +1,14 @@
 name: Fetch prices
 
-# Runs twice a day. Ads are posted a day early (e.g. Safeway posts Tue, starts Wed);
-# the app decides what's active by each ad's start/end date, so an early fetch is
-# harmless and a late one still switches on time.
+# Runs just after midnight Pacific, when new ads start (Safeway Wed, Costco Mon).
+# The app decides what's active by each ad's start/end date, so an early fetch is
+# harmless and an already-fetched upcoming ad switches on at midnight by itself.
+# GitHub schedules in UTC, so two runs an hour apart keep one just after midnight
+# all year: summer (PDT) 12:10am + 1:10am, winter (PST) 11:10pm + 12:10am.
 on:
   schedule:
-    - cron: '17 13 * * *'   # ~6:17am Pacific (5:17am in winter)
-    - cron: '17 1 * * *'    # ~6:17pm Pacific (5:17pm in winter)
+    - cron: '10 7 * * *'
+    - cron: '10 8 * * *'
   workflow_dispatch:
     inputs:
       chains:
