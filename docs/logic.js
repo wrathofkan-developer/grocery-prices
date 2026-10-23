@@ -38,22 +38,26 @@ export function tokens(s) {
 }
 
 // Words that end a name without being the thing itself ("Milk Half gallon", "Thighs Value Pack").
-const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', 'pack', 'value', 'family', 'size', 'bag', 'box', 'bottle', 'jar', 'can', 'carton', 'dozen', 'large', 'small', 'medium', 'organic', 'fresh', 'frozen', 'pk', 'each', 'ea', 'roll', 'mega']);
+const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', 'pack', 'value', 'family', 'size', 'bag', 'box', 'bottle', 'jar', 'can', 'carton', 'dozen', 'large', 'small', 'medium', 'organic', 'fresh', 'frozen', 'pk', 'each', 'ea', 'roll', 'mega', 'triple', 'double']);
 
 /**
- * The head noun of each product in a name. Ad copy can list several products
- * ("Nature Valley Bars. Lucerne Milk Half gallon. Chex Cereal"), so split first.
+ * Each product named in an item, with its head noun. Ad copy can list several
+ * products ("Nature Valley Bars. Lucerne Milk Half gallon. Chex Cereal").
  */
-function heads(name) {
-  const out = new Set();
+function segments(name) {
+  const out = [];
   for (const seg of String(name).split(/[.,;]|\bor\b|\band\b/i)) {
-    // "Greek Yogurt Made with Whole Milk" is yogurt: the thing comes before "with".
-    const core = seg.split(/\b(?:made with|with|w\/)\b/i)[0];
+    // The thing comes before "with"/"in": "Greek Yogurt Made with Whole Milk" is yogurt,
+    // "Tuna in Olive Oil" is tuna.
+    const core = seg.split(/\s(?:made with|with|in|w\/)\s/i)[0]; // spaces: not "Bone-In"
     const t = tokens(core).filter((w) => !/^\d/.test(w));
     while (t.length && TAIL_NOISE.has(t[t.length - 1])) t.pop();
     if (!t.length) continue;
-    out.add(t[t.length - 1]);
-    if (t.length > 1) out.add(t[t.length - 2] + t[t.length - 1]); // "oat milk" -> "oatmilk"
+    out.push({
+      tok: t,
+      head: t[t.length - 1],
+      head2: t.length > 1 ? t[t.length - 2] + t[t.length - 1] : null, // "oat milk" -> "oatmilk"
+    });
   }
   return out;
 }
@@ -61,7 +65,79 @@ function heads(name) {
 /** Pre-compute search keys once per item. */
 export function indexItem(item) {
   const t = tokens(`${item.name} ${item.brand || ''}`);
-  return { ...item, _tok: t, _joined: t.join(''), _heads: heads(item.name) };
+  const segs = segments(item.name);
+  const heads = new Set();
+  for (const s of segs) { heads.add(s.head); if (s.head2) heads.add(s.head2); }
+  return { ...item, _tok: t, _joined: t.join(''), _segs: segs, _heads: heads };
+}
+
+// ---------- how "basic" a match is ----------
+// When someone adds a plain item like "eggs", the basic version (a carton) should
+// win over prepared or flavored ones (Jammy Egg), and a different product that
+// merely ends in the same word (peanut butter for "butter") should rank last.
+
+// Modifiers that make an item a prepared/flavored version rather than the plain thing.
+const PREPARED = new Set([
+  'jammy', 'breaded', 'roasted', 'fried', 'crispy', 'crunchy', 'smoked', 'seasoned', 'flavored', 'spicy', 'glazed',
+  'marinated', 'cooked', 'grilled', 'baked', 'stuffed', 'herbed', 'mashed', 'pickled', 'riced', 'dried', 'freeze',
+  'canned', 'candied', 'covered', 'coated', 'dipped', 'infused', 'sweetened',
+  'salad', 'soup', 'sauce', 'dip', 'spread', 'mix', 'bite', 'chip', 'sandwich', 'burrito', 'frittata', 'wrap', 'bar',
+  'snack', 'cake', 'pie', 'cookie', 'cracker', 'candy', 'toffee', 'roll', 'dumpling', 'skewer', 'nugget', 'tender',
+  'chocolate', 'cocoa', 'caramel', 'vanilla', 'cinnamon', 'pumpkin', 'honey', 'maple', 'mint', 'teriyaki', 'bbq',
+  'buffalo', 'ranch', 'nacho', 'jalapeno', 'chile', 'chili', 'garlic', 'herb', 'sesame', 'walnut', 'pecan', 'fig',
+  'strawberry', 'blueberry', 'raspberry', 'mango', 'peach', 'cherry', 'berry', 'lemon', 'lime', 'apple', 'coconut',
+  'peeled', 'diced', 'crushed', 'paste', 'asado', 'shawarma', 'adobo', 'chimichurri', 'sous', 'vide', 'curry', 'tikka', 'pesto', 'alfredo', 'cheesy',
+]);
+
+// Compounds that are a different product from their last word.
+const DISTINCT = [
+  'peanut butter', 'almond butter', 'cookie butter', 'apple butter', 'cashew butter', 'sunflower butter',
+  'granola butter', 'seed butter', 'fig butter',
+  'cream cheese', 'cottage cheese', 'macaroni and cheese', 'mac and cheese', 'mac n cheese', 'string cheese',
+  'ice cream', 'sour cream', 'whipped cream', 'chocolate milk', 'coconut milk', 'oat milk', 'almond milk', 'soy milk',
+  'sweet potatoes', 'green onions', 'green beans', 'hot dogs', 'corn dogs', 'tortilla chips', 'potato chips',
+  'chicken broth', 'vegetable broth', 'coffee cake', 'corn bread', 'banana bread', 'pita bread', 'garlic bread',
+].map((s) => tokens(s));
+
+const sameTokens = (a, b) => a.length === b.length && a.every((w, i) => w === b[i]);
+
+/** The product segment within an item that the plain term refers to. */
+function matchingSegment(item, termTokens) {
+  const joined = termTokens.join('');
+  const last = termTokens[termTokens.length - 1];
+  return item._segs.find((s) => s.head2 === joined || s.head === joined) ||
+    item._segs.find((s) => s.head === last) || null;
+}
+
+/**
+ * 0 = the plain thing, 1 = a prepared/flavored version, 2 = a different product
+ * that ends in the same word. Lower ranks first.
+ */
+export function basicTier(item, termTokens) {
+  const seg = matchingSegment(item, termTokens);
+  if (!seg) return 2;
+  const last = termTokens[termTokens.length - 1];
+  for (const d of DISTINCT) {
+    // Skip compounds that are the search itself or part of it ("cheddar cheese" isn't excluded by "cheese").
+    if (d[d.length - 1] !== last || d.every((w) => termTokens.includes(w))) continue;
+    // "Peanut Butter" for "butter", "Macaroni & Cheese" for "cheddar cheese".
+    if (seg.tok.length >= d.length && sameTokens(seg.tok.slice(seg.tok.length - d.length), d)) return 2;
+  }
+  // Matched only as a later item in ad copy or an ingredient list ("…Bark, Almonds, Sea Salt").
+  if (item._segs.indexOf(seg) > 0) return 1;
+  const extra = seg.tok.filter((w) => !termTokens.includes(w));
+  return extra.some((w) => PREPARED.has(w)) ? 1 : 0;
+}
+
+/** "No Salt", "Salt-Free" are not salt. */
+function negated(item, termTokens) {
+  const last = termTokens[termTokens.length - 1];
+  const t = item._tok;
+  for (let i = 0; i < t.length; i++) {
+    if (t[i] !== last) continue;
+    if (t[i - 1] === 'no' || t[i - 1] === 'without' || t[i + 1] === 'free') return true;
+  }
+  return false;
 }
 
 /** Loose prefix match, used only while typing to build suggestions. */
@@ -81,6 +157,7 @@ export function matchesGeneric(item, termTokens) {
   if (!termTokens.length) return false;
   const joined = termTokens.join('');
   const last = termTokens[termTokens.length - 1];
+  if (negated(item, termTokens)) return false;
   if (item._heads.has(joined)) return true; // "oatmilk" head for "oat milk"
   if (!item._heads.has(last)) return false;
   return termTokens.every((w) => item._tok.includes(w));
@@ -106,8 +183,9 @@ export function entryMatcher(entry) {
 // Common things people put on a grocery list. These are offered first as plain
 // choices, even when no store has a price for them yet.
 export const STAPLES = [
-  'eggs', 'milk', 'whole milk', 'oat milk', 'almond milk', 'soy milk', 'half and half', 'heavy cream', 'butter', 'cheese',
-  'cheddar cheese', 'mozzarella', 'parmesan', 'cream cheese', 'sour cream', 'yogurt', 'greek yogurt', 'cottage cheese',
+  'eggs', 'milk', 'whole milk', 'oat milk', 'almond milk', 'soy milk', 'coconut milk', 'chocolate milk', 'half and half',
+  'heavy cream', 'butter', 'cheese', 'cheddar cheese', 'mozzarella', 'parmesan', 'cream cheese', 'sour cream', 'yogurt',
+  'greek yogurt', 'cottage cheese', 'macaroni and cheese', 'almond butter', 'cookie butter', 'green onions',
   'bread', 'bagels', 'tortillas', 'english muffins', 'buns', 'croissants',
   'bananas', 'apples', 'oranges', 'lemons', 'limes', 'grapes', 'strawberries', 'blueberries', 'raspberries', 'avocados',
   'tomatoes', 'potatoes', 'sweet potatoes', 'onions', 'garlic', 'carrots', 'celery', 'broccoli', 'cauliflower', 'spinach',
@@ -149,8 +227,10 @@ export function suggest(items, text, today, { maxStaples = 3, maxProducts = 7 } 
     .sort((a, b) => (b.label.startsWith(raw) - a.label.startsWith(raw)) || a.t.length - b.t.length || a.label.localeCompare(b.label))
     .slice(0, maxStaples)
     .map((s) => {
-      const hits = live.filter((i) => matchesGeneric(i, s.t) && i.price != null);
-      const low = hits.reduce((m, i) => (m == null || i.price < m ? i.price : m), null);
+      const cmp = ranker({ q: s.label, mode: 'generic' });
+      const hits = live.filter((i) => matchesGeneric(i, s.t) && i.price != null).sort(cmp);
+      // Price shown is the basic pick's, the same one the list will use.
+      const low = hits.length ? hits[0].price : null;
       return { type: 'generic', q: s.label, label: s.label, count: hits.length, low, chains: [...new Set(hits.map((i) => i.chain))] };
     });
 
@@ -209,16 +289,30 @@ export function findMatches(items, entry, today) {
  * For one list entry: active matches ranked, best per chain, overall best,
  * and any upcoming ad price that beats today's best.
  */
+/** Plain items rank the basic version first, then by value; products rank by value. */
+export function ranker(entry) {
+  if (entry.mode === 'product') return compareValue;
+  const t = tokens(entry.q);
+  const tier = new Map();
+  const tierOf = (i) => { if (!tier.has(i)) tier.set(i, basicTier(i, t)); return tier.get(i); };
+  return (a, b) => {
+    // A priced item beats an unpriced one; otherwise basic beats prepared, then value.
+    if ((a.price == null) !== (b.price == null)) return a.price == null ? 1 : -1;
+    return tierOf(a) - tierOf(b) || compareValue(a, b);
+  };
+}
+
 export function analyzeEntry(items, entry, today) {
   const all = findMatches(items, entry, today);
-  const active = all.filter((i) => priceStatus(i, today) === 'active').sort(compareValue);
-  const upcoming = all.filter((i) => priceStatus(i, today) === 'upcoming').sort(compareValue);
+  const cmp = ranker(entry);
+  const active = all.filter((i) => priceStatus(i, today) === 'active').sort(cmp);
+  const upcoming = all.filter((i) => priceStatus(i, today) === 'upcoming').sort(cmp);
   const perChain = {};
-  for (const it of active) if (!perChain[it.chain] || compareValue(it, perChain[it.chain]) < 0) perChain[it.chain] = it;
+  for (const it of active) if (!perChain[it.chain] || cmp(it, perChain[it.chain]) < 0) perChain[it.chain] = it;
   const pinned = entry.pin ? active.find((i) => i.id === entry.pin) || null : null;
   const best = active.find((i) => i.price != null) || null;
   const chosen = pinned || best;
-  const soon = upcoming.find((u) => u.price != null && (!chosen || compareValue(u, chosen) < 0)) || null;
+  const soon = upcoming.find((u) => u.price != null && (!chosen || cmp(u, chosen) < 0)) || null;
   return { active, upcoming, perChain, best, pinned, chosen, soon };
 }
 

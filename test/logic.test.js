@@ -87,3 +87,26 @@ test('nearest store and labels', () => {
   assert.deepEqual(tokens("Trader Joe's Eggs"), ['trader', 'joe', 'egg']);
   assert.equal(unitLabel({ value: 0.078, unit: 'fl_oz' }), '7.8¢/fl oz');
 });
+
+test('plain items pick the basic version first', () => {
+  const pool = [
+    mk({ id: 'jammy', chain: 'traderjoes', name: 'Chino Valley Ranchers The Jammy Egg', price: 3.99 }),
+    mk({ id: 'carton', chain: 'traderjoes', name: 'Pasture Raised Large Brown Eggs', price: 5.99 }),
+    mk({ id: 'pb', chain: 'traderjoes', name: 'Peanut Butter with Honey', price: 2.99 }),
+    mk({ id: 'butter', chain: 'traderjoes', name: 'Danish Creamery Butter', price: 3.99 }),
+    mk({ id: 'nosalt', chain: 'traderjoes', name: 'Almond Butter Creamy No Salt', price: 6.49 }),
+    mk({ id: 'salt', chain: 'traderjoes', name: 'Sea Salt', price: 1.99 }),
+    mk({ id: 'thigh', chain: 'traderjoes', name: 'All Natural Bone-In Skin-On Chicken Thighs', price: 2.29, price_per: 'lb' }),
+    mk({ id: 'asado', chain: 'traderjoes', name: 'Pollo Asado Chicken Thighs', price: 1.99, price_per: 'lb' }),
+    mk({ id: 'tuna', chain: 'safeway', name: 'Tuna in Olive Oil', price: 2.49 }),
+    mk({ id: 'oil', chain: 'safeway', name: 'Extra Virgin Olive Oil', price: 8.99 }),
+  ];
+  const first = (q) => analyzeEntry(pool, { q, qty: 1 }, today).chosen?.id;
+  assert.equal(first('eggs'), 'carton', 'carton beats cheaper Jammy Egg');
+  assert.equal(first('butter'), 'butter', 'peanut butter is a different product');
+  assert.equal(first('salt'), 'salt');
+  assert.ok(!analyzeEntry(pool, { q: 'salt', qty: 1 }, today).active.some((i) => i.id === 'nosalt'), '"No Salt" is not salt');
+  assert.equal(first('chicken thighs'), 'thigh', '"Bone-In" is not a split point; plain beats seasoned');
+  assert.equal(first('olive oil'), 'oil', '"Tuna in Olive Oil" is tuna');
+  assert.equal(first('peanut butter'), 'pb');
+});

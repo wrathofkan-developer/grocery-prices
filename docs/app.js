@@ -118,7 +118,7 @@ function rowHtml(e, a, i) {
         <span aria-live="polite">${e.qty}</span>
         <button type="button" data-act="inc" data-i="${i}" aria-label="More">+</button>
       </div>
-      ${a.active.length ? `<button type="button" class="link-btn" data-act="toggle" data-i="${i}" aria-expanded="${open}">${open ? 'Hide' : `See all ${a.active.length} matches`}</button>` : ''}
+      ${a.active.length > 1 ? `<button type="button" class="link-btn" data-act="toggle" data-i="${i}" aria-expanded="${open}">${open ? 'Hide' : `See all ${a.active.length} matches`}</button>` : ''}
       <button type="button" class="link-btn danger" data-act="remove" data-i="${i}" aria-label="Remove ${esc(e.q)}">Remove</button>
     </div>
     ${open ? matchesHtml(e, a, i) : ''}
@@ -278,7 +278,7 @@ function renderSuggest() {
     } else {
       meta = o.chains.map((c) => `${dot(c)}${CHAINS[c].name}`).join('&ensp;');
     }
-    const price = o.low != null ? `<span class="opt-price">${o.type === 'generic' ? 'from ' : ''}${money(o.low)}</span>` : '';
+    const price = o.low != null ? `<span class="opt-price">${money(o.low)}</span>` : '';
     return `${sep}<li id="opt-${i}" class="opt ${o.type}" role="option" aria-selected="${i === activeOpt}" data-i="${i}">
       <span class="opt-name">${esc(o.label)}</span>${price}<span class="opt-meta">${meta}</span></li>`;
   }).join('');
