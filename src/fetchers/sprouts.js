@@ -50,14 +50,14 @@ export function parseSproutsFlyer(flyersJson, activitiesJson, { tag, storeIds })
       valid_from,
       valid_to,
       ad_id: String(flyer.id),
-      ad_name: `${flyer.name || 'Ad'} (${tag})`,
+      ad_name: flyer.name || `${tag[0].toUpperCase()}${tag.slice(1)} Ad`,
       category: null,
       image: null,
       url: `${BASE}/${tag}/print`,
     });
   }
   return {
-    ad: { id: String(flyer.id), name: `${flyer.name} (${tag})`, stores: storeIds, valid_from, valid_to, items: items.length, retailerLocationId: loc.retailerLocationId },
+    ad: { id: String(flyer.id), name: flyer.name || `${tag[0].toUpperCase()}${tag.slice(1)} Ad`, stores: storeIds, valid_from, valid_to, items: items.length, retailerLocationId: loc.retailerLocationId },
     items,
   };
 }

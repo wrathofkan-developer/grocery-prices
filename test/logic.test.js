@@ -110,3 +110,12 @@ test('plain items pick the basic version first', () => {
   assert.equal(first('olive oil'), 'oil', '"Tuna in Olive Oil" is tuna');
   assert.equal(first('peanut butter'), 'pb');
 });
+
+test('cut/form words: "Walnut Halves & Pieces" is walnuts', () => {
+  const pool = [
+    mk({ id: 'wh', chain: 'sprouts', name: 'Walnut Halves & Pieces', price: 5.99 }),
+    mk({ id: 'wb', chain: 'traderjoes', name: 'California Walnut Baking Pieces', price: 6.49 }),
+    mk({ id: 'ws', chain: 'traderjoes', name: 'Honey Walnut Shrimp', price: 6.99 }),
+  ];
+  assert.deepEqual(analyzeEntry(pool, { q: 'walnuts', qty: 1 }, today).active.map((i) => i.id).sort(), ['wb', 'wh']);
+});

@@ -38,7 +38,9 @@ export function tokens(s) {
 }
 
 // Words that end a name without being the thing itself ("Milk Half gallon", "Thighs Value Pack").
-const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', 'pack', 'value', 'family', 'size', 'bag', 'box', 'bottle', 'jar', 'can', 'carton', 'dozen', 'large', 'small', 'medium', 'organic', 'fresh', 'frozen', 'pk', 'each', 'ea', 'roll', 'mega', 'triple', 'double']);
+const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', 'pack', 'value', 'family', 'size', 'bag', 'box', 'bottle', 'jar', 'can', 'carton', 'dozen', 'large', 'small', 'medium', 'organic', 'fresh', 'frozen', 'pk', 'each', 'ea', 'roll', 'mega', 'triple', 'double',
+  // Cut/form words: "Walnut Halves & Pieces" is walnuts, "Pineapple Chunks" is pineapple.
+  'halve', 'piece', 'slice', 'chunk', 'floret', 'bit', 'wedge', 'sliver', 'spear', 'baking']);
 
 /**
  * Each product named in an item, with its head noun. Ad copy can list several
@@ -196,7 +198,7 @@ export const STAPLES = [
   'salt', 'pepper', 'olive oil', 'vegetable oil', 'vinegar', 'soy sauce', 'ketchup', 'mustard', 'mayonnaise', 'hot sauce',
   'salsa', 'hummus', 'peanut butter', 'jam', 'honey', 'maple syrup', 'beans', 'black beans', 'chickpeas', 'canned tomatoes',
   'tomato sauce', 'pasta sauce', 'broth', 'chicken broth', 'soup', 'crackers', 'chips', 'tortilla chips', 'pretzels',
-  'popcorn', 'cookies', 'nuts', 'almonds', 'walnuts', 'cashews', 'trail mix', 'granola bars', 'chocolate',
+  'popcorn', 'cookies', 'nuts', 'almonds', 'walnuts', 'pecans', 'cashews', 'trail mix', 'granola bars', 'chocolate',
   'coffee', 'tea', 'orange juice', 'apple juice', 'sparkling water', 'water', 'soda', 'kombucha', 'beer', 'wine',
   'ice cream', 'frozen pizza', 'frozen vegetables', 'frozen fruit', 'waffles', 'dumplings',
   'paper towels', 'toilet paper', 'trash bags', 'dish soap', 'laundry detergent', 'aluminum foil', 'zip bags', 'napkins',
