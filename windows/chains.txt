@@ -1,0 +1,4 @@
+# Stores fetched from your Windows PC instead of GitHub, one per line.
+# Sprouts always runs here (it needs a real browser).
+# Add safeway / traderjoes / costco if GitHub's servers get blocked by that site.
+sprouts

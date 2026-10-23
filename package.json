@@ -17,5 +17,8 @@
     "node-html-parser": "^6.1.13"
   },
   "type": "module",
-  "private": true
+  "private": true,
+  "optionalDependencies": {
+    "playwright": "^1.48.0"
+  }
 }

@@ -1,1 +1,79 @@
-<!doctype html><title>Grocery Prices</title><p>App coming soon.</p>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grocery Prices</title>
+<meta name="description" content="Weekly ads and shelf prices for Safeway, Trader Joe's, Sprouts and Costco around South San Francisco and Daly City.">
+<meta name="theme-color" content="#F3F6F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111715" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Groceries">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-row">
+    <h1>Grocery prices</h1>
+    <button id="locBtn" class="loc" type="button" aria-label="Use my location for store distances">
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+      <span id="locLabel">Near South SF</span>
+    </button>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-list" aria-controls="view-list" aria-selected="true" data-tab="list">My list</button>
+    <button role="tab" id="tab-deals" aria-controls="view-deals" aria-selected="false" data-tab="deals">This week's deals</button>
+    <button role="tab" id="tab-stores" aria-controls="view-stores" aria-selected="false" data-tab="stores">Stores</button>
+  </nav>
+</header>
+
+<main>
+  <section id="view-list" role="tabpanel" aria-labelledby="tab-list">
+    <form id="addForm" class="add" autocomplete="off">
+      <label for="addInput" class="sr-only">Add an item</label>
+      <input id="addInput" type="text" placeholder="Add an item, like oat milk or eggs" enterkeyhint="done" list="suggest">
+      <datalist id="suggest"></datalist>
+      <button type="submit">Add</button>
+    </form>
+    <ol id="list" class="list"></ol>
+    <div id="listEmpty" class="empty" hidden>
+      <p>Your list is empty. Add what you need and you'll see the lowest price nearby and which store has it.</p>
+    </div>
+  </section>
+
+  <section id="view-deals" role="tabpanel" aria-labelledby="tab-deals" hidden>
+    <div class="filters">
+      <label for="dealSearch" class="sr-only">Search deals</label>
+      <input id="dealSearch" type="search" placeholder="Search this week's ads">
+      <div id="chainFilter" class="chips" role="group" aria-label="Filter by store"></div>
+    </div>
+    <div id="deals"></div>
+  </section>
+
+  <section id="view-stores" role="tabpanel" aria-labelledby="tab-stores" hidden>
+    <div id="stores"></div>
+  </section>
+</main>
+
+<footer id="totalBar" class="total" hidden>
+  <div class="total-main">
+    <span class="total-label">Estimated total</span>
+    <span id="totalAmount" class="total-amount">$0.00</span>
+  </div>
+  <p id="totalNote" class="total-note"></p>
+  <button id="tripBtn" class="trip-btn" type="button" aria-expanded="false" aria-controls="tripPanel">Compare one-stop trips</button>
+  <div id="tripPanel" class="trip" hidden></div>
+</footer>
+
+<div id="loadError" class="load-error" role="alert" hidden></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
