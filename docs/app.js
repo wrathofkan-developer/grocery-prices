@@ -52,6 +52,11 @@ async function load() {
 }
 
 // ---------- shared bits ----------
+/** Item name that opens the product (or ad) page at the store, in a new tab. */
+const itemLink = (it) => it.url
+  ? `<a class="item-link" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.name)}</a>`
+  : esc(it.name);
+
 const dot = (chain) => `<span class="chain-dot" style="background:var(--${chain})" aria-hidden="true"></span>`;
 
 function priceTag(item) {
@@ -111,7 +116,7 @@ function rowHtml(e, a, i) {
     ? `<p class="upcoming-note">${CHAINS[a.soon.chain].name} drops to ${money(a.soon.price)} on ${dayLabel(a.soon.valid_from)}</p>`
     : '';
   const where = c
-    ? `<p class="row-where">${dot(c.chain)}<b>${esc(c.name)}</b><br>${whereText(c)}${untilText(c)}${a.pinned ? ' · your pick' : ''}</p>`
+    ? `<p class="row-where">${dot(c.chain)}<b>${itemLink(c)}</b><br>${whereText(c)}${untilText(c)}${a.pinned ? ' · your pick' : ''}</p>`
     : a.active.length
       ? `<p class="row-where">${a.active.length} ad mention${a.active.length > 1 ? 's' : ''} without a listed price</p>`
       : `<p class="nomatch">No store has a price for ${esc(e.q)} this week.</p>`;
@@ -142,7 +147,7 @@ function matchesHtml(e, a, i) {
     const pinned = e.pin === it.id;
     const meta = [whereText(it), it.size_text ? esc(it.size_text) : '', it.deal_text ? esc(it.deal_text) : ''].filter(Boolean).join(' · ');
     return `<li class="match">
-      <p class="match-name">${dot(it.chain)}${esc(it.name)}</p>
+      <p class="match-name">${dot(it.chain)}${itemLink(it)}</p>
       <p class="match-meta">${meta}</p>
       <div class="match-price">
         <strong>${it.price != null ? money(it.price) + (it.price_per === 'lb' ? '/lb' : '') : 'See ad'}</strong>
@@ -214,7 +219,7 @@ function renderDeals() {
       if (shown >= state.dealLimit) break;
       shown++;
       rows.push(`<div class="deal">
-        <p class="name">${g.chain ? '' : dot(it.chain)}${esc(it.name)}</p>
+        <p class="name">${g.chain ? '' : dot(it.chain)}${itemLink(it)}</p>
         <p class="meta">${[it.size_text, it.deal_text].filter(Boolean).map(esc).join(' · ') || '&nbsp;'}</p>
         ${priceTag(it)}
         <button type="button" class="deal-add" data-act="add-deal" data-name="${esc(shortName(it.name))}">Add to list</button>

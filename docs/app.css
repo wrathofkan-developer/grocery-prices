@@ -182,3 +182,6 @@ main { max-width: 640px; margin: 0 auto; padding: 16px; }
   .matches { animation: open .16s ease-out; }
   @keyframes open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 }
+
+.item-link { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.item-link:hover, .item-link:focus-visible { text-decoration-color: currentColor; }
