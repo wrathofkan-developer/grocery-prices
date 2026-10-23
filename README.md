@@ -52,6 +52,6 @@ This registers **Grocery Prices Fetch** in Task Scheduler: 6:40am and 6:40pm dai
 
 ## Notes
 
-- About half of Sprouts' ad items are percent-off or BOGO deals shown only in the ad image. They appear as "See ad".
+- Sprouts ad tiles are expanded into their products (~290 a week). Buy-1-get-1 deals show the per-unit price with the deal plus one unit without it; totals follow the deal exactly. Sprouts' monthly ad is image-only, with no readable items.
 - Costco book items listed as "Save $X" have no shelf price on the page.
 - Store data comes from public pages for personal use. A public release would need licensed data (e.g. Flipp's partner program).
