@@ -126,7 +126,7 @@ test('eggs show price per dozen', async () => {
   assert.deepEqual(tj.unit_price, { value: 5.99 / 12, unit: 'ct' });
   assert.equal(unitLabel(tj.unit_price, tj), '$5.99/doz');
   const sprouts18 = indexItem({ ...mk({ id: 's', chain: 'sprouts', name: 'Large Grade A Eggs', price: 6.99 }), unit_price: { value: 6.99 / 18, unit: 'ct' } });
-  assert.equal(unitLabel(sprouts18.unit_price, sprouts18), '$4.66/doz');
+  assert.equal(unitLabel(sprouts18.unit_price, sprouts18), '18-pack · $4.66/doz');
   // Other counted items keep per-each.
   const avo = indexItem({ ...mk({ id: 'a', chain: 'traderjoes', name: 'Avocados 4 count', price: 3.99 }), unit_price: { value: 3.99 / 4, unit: 'ct' } });
   assert.equal(unitLabel(avo.unit_price, avo), '$1.00/ea');

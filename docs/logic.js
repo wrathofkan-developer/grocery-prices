@@ -401,7 +401,10 @@ export function unitLabel(up, item) {
   if (!up) return '';
   const v = up.value;
   if (up.unit === 'ct' && item?._heads && [...BY_DOZEN].some((h) => item._heads.has(h))) {
-    return `$${(v * 12).toFixed(2)}/doz`;
+    const perDoz = `$${(v * 12).toFixed(2)}/doz`;
+    // A non-dozen pack says so: "18-pack · $4.66/doz".
+    const n = item.price > 0 ? Math.round(item.price / v) : 12;
+    return n && n !== 12 ? `${n}-pack · ${perDoz}` : perDoz;
   }
   return v >= 0.995 ? `$${v.toFixed(2)}/${UNIT_LABEL[up.unit]}` : `${(v * 100).toFixed(1)}¢/${UNIT_LABEL[up.unit]}`;
 }
