@@ -89,8 +89,10 @@ export async function fetchSprouts(stores) {
         }
       };
       page.on('response', onResp);
-      await page.goto(`${BASE}/${tag}/print`, { waitUntil: 'networkidle', timeout: 60000 });
-      for (let i = 0; i < 20 && !(captured.Flyers && captured.FlyerActivities); i++) await page.waitForTimeout(500);
+      // The storefront never goes network-idle (analytics keep polling), so load the
+      // page and then wait only for the two responses we need.
+      await page.goto(`${BASE}/${tag}/print`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      for (let i = 0; i < 90 && !(captured.Flyers && captured.FlyerActivities); i++) await page.waitForTimeout(500);
       page.off('response', onResp);
 
       // Confirm the storefront picked our store (it geolocates by IP).
