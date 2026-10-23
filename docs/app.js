@@ -151,6 +151,7 @@ function matchesHtml(e, a, i) {
       <p class="match-meta">${meta}</p>
       <div class="match-price">
         <strong>${it.price != null ? money(it.price) + (it.price_per === 'lb' ? '/lb' : '') : 'See ad'}</strong>
+        ${it.price != null && it.price_per !== 'lb' && unitLabel(it.unit_price, it) ? `<span class="match-unit">${unitLabel(it.unit_price, it)}</span>` : ''}
         ${it.price != null ? `<button type="button" data-act="pin" data-i="${i}" data-item="${esc(it.id)}" aria-pressed="${pinned}">${pinned ? 'Picked' : 'Pick this'}</button>` : ''}
       </div>
     </li>`;

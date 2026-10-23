@@ -127,6 +127,7 @@ main { max-width: 640px; margin: 0 auto; padding: 16px; }
 .match-meta { font-size: 13px; color: var(--muted); margin: 0; }
 .match-price { grid-row: 1 / span 2; grid-column: 2; text-align: right; }
 .match-price strong { font: 700 20px var(--num); display: block; }
+.match-unit { display: block; font: 500 13px/1.2 var(--num); color: var(--muted); }
 .match-price button { border: 1px solid var(--line); background: none; border-radius: 999px; font-size: 13px; padding: 3px 10px; margin-top: 4px; }
 .match-price button[aria-pressed="true"] { background: var(--green); color: var(--green-ink); border-color: var(--green); }
 .upcoming-note { font-size: 13px; color: var(--green); margin: 4px 0 0; }
