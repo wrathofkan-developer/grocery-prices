@@ -13,7 +13,6 @@ function Log($m) { "$(Get-Date -Format 'HH:mm:ss') $m" | Tee-Object -FilePath $l
 # Commit identity for this project folder only (your global Git settings are untouched).
 git config user.name 'price-bot (windows)'
 git config user.email 'price-bot@users.noreply.github.com'
-git config core.autocrlf false
 
 $chains = (Get-Content "$Repo\windows\chains.txt" | Where-Object { $_ -and -not $_.StartsWith('#') }) -join ' '
 if (-not $chains) { $chains = 'sprouts' }
@@ -22,7 +21,7 @@ if (-not $chains) { $chains = 'sprouts' }
 Log 'Pulling latest from GitHub'
 git reset -q -- docs/data
 git checkout -q -- docs/data 2>$null
-git pull --rebase 2>&1 | ForEach-Object { Log $_ }
+git pull --rebase --autostash 2>&1 | ForEach-Object { Log $_ }
 
 Log "Fetching: $chains"
 $env:FETCH_RUNNER = 'windows'
@@ -36,7 +35,7 @@ git commit -q -m "Update prices from Windows PC ($chains) $(Get-Date -Format 'yy
 if ($LASTEXITCODE -ne 0) { Log 'Commit failed - nothing pushed'; exit 1 }
 
 for ($i = 1; $i -le 3; $i++) {
-  git pull --rebase 2>&1 | ForEach-Object { Log $_ }
+  git pull --rebase --autostash 2>&1 | ForEach-Object { Log $_ }
   git push 2>&1 | ForEach-Object { Log $_ }
   if ($LASTEXITCODE -eq 0) { Log 'Pushed to GitHub'; exit 0 }
   Start-Sleep -Seconds 5
