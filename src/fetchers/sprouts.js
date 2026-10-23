@@ -149,21 +149,6 @@ async function openPopups(page) {
   ).catch(() => []);
 }
 
-/** Confirm the shop-mode popup if it shows our store; otherwise close it. */
-async function confirmStorePopup(page, storeCode) {
-  const start = page.getByRole('button', { name: /^start shopping$/i }).first();
-  if (!(await start.isVisible().catch(() => false))) return;
-  const text = (await openPopups(page)).join(' ');
-  if (storeCode && new RegExp(`Store #${storeCode}\\b`).test(text)) {
-    await start.click({ timeout: 5000 }).catch(() => start.evaluate((el) => el.click()).catch(() => {}));
-  } else {
-    const shown = (text.match(/Store #(\d+)/) || [])[1];
-    console.warn(`Sprouts: store popup shows Store #${shown ?? '?'}, not #${storeCode}; closing it without confirming.`);
-    await page.keyboard.press('Escape').catch(() => {});
-  }
-  await page.waitForTimeout(800);
-}
-
 /** Browser-driven fetch. Requires `npm i playwright` + `npx playwright install chromium` (Windows setup does this). */
 export async function fetchSprouts(stores) {
   let chromium;
@@ -214,21 +199,12 @@ export async function fetchSprouts(stores) {
 
       // Open one tile to learn the product-panel request, then load every tile's products.
       const tiles = res.items.filter((t) => t.collection_id);
-      // A fresh browser gets a "How would you like to shop?" popup that covers the page.
-      // It already shows the store picked from the PC's location; confirm it only if
-      // it's our store, otherwise close it and warn.
-      if (tiles.length) await confirmStorePopup(page, expected);
-
+      // A fresh browser gets a "How would you like to shop?" popup covering the page,
+      // which blocks normal clicks. Click the tile directly in the page instead.
       for (const t of tiles.slice(0, 3)) {
         if (collectionUrl) break;
         const btn = page.getByRole('button', { name: t.name, exact: true }).first();
-        try {
-          await btn.click({ timeout: 10000 });
-        } catch (e) {
-          // Something still covers the tile: click it directly in the page instead.
-          console.warn(`Sprouts: normal click on "${t.name}" blocked (${e.message.split('\n')[0]}); clicking directly`);
-          await btn.evaluate((el) => el.click()).catch(() => {});
-        }
+        await btn.evaluate((el) => el.click()).catch((e) => console.warn(`Sprouts: couldn't click "${t.name}" (${e.message.split('\n')[0]})`));
         for (let i = 0; i < 30 && !collectionUrl; i++) await page.waitForTimeout(500);
         if (!collectionUrl) {
           const popups = await openPopups(page);
