@@ -143,6 +143,27 @@ export function parseCollectionProducts(json, tile) {
   return out;
 }
 
+async function openPopups(page) {
+  return page.locator('[role="dialog"], [aria-modal="true"]').evaluateAll(
+    (els) => els.map((el) => el.innerText.replace(/\s+/g, ' ').trim().slice(0, 140)).filter(Boolean),
+  ).catch(() => []);
+}
+
+/** Confirm the shop-mode popup if it shows our store; otherwise close it. */
+async function confirmStorePopup(page, storeCode) {
+  const start = page.getByRole('button', { name: /^start shopping$/i }).first();
+  if (!(await start.isVisible().catch(() => false))) return;
+  const text = (await openPopups(page)).join(' ');
+  if (storeCode && new RegExp(`Store #${storeCode}\\b`).test(text)) {
+    await start.click({ timeout: 5000 }).catch(() => start.evaluate((el) => el.click()).catch(() => {}));
+  } else {
+    const shown = (text.match(/Store #(\d+)/) || [])[1];
+    console.warn(`Sprouts: store popup shows Store #${shown ?? '?'}, not #${storeCode}; closing it without confirming.`);
+    await page.keyboard.press('Escape').catch(() => {});
+  }
+  await page.waitForTimeout(800);
+}
+
 /** Browser-driven fetch. Requires `npm i playwright` + `npx playwright install chromium` (Windows setup does this). */
 export async function fetchSprouts(stores) {
   let chromium;
@@ -193,30 +214,25 @@ export async function fetchSprouts(stores) {
 
       // Open one tile to learn the product-panel request, then load every tile's products.
       const tiles = res.items.filter((t) => t.collection_id);
-      let diagnosed = false;
+      // A fresh browser gets a "How would you like to shop?" popup that covers the page.
+      // It already shows the store picked from the PC's location; confirm it only if
+      // it's our store, otherwise close it and warn.
+      if (tiles.length) await confirmStorePopup(page, expected);
+
       for (const t of tiles.slice(0, 3)) {
         if (collectionUrl) break;
+        const btn = page.getByRole('button', { name: t.name, exact: true }).first();
         try {
-          await page.getByRole('button', { name: t.name, exact: true }).first().click({ timeout: 15000 });
-          for (let i = 0; i < 30 && !collectionUrl; i++) await page.waitForTimeout(500);
+          await btn.click({ timeout: 10000 });
         } catch (e) {
-          console.warn(`Sprouts: couldn't open ad tile "${t.name}" (${e.message.split('\n')[0]})`);
-          if (!diagnosed) {
-            // Diagnostics: what does the page look like, and why did the click fail?
-            diagnosed = true;
-            console.warn(`Sprouts: click details:\n${e.message.split('\n').slice(0, 25).map((l) => `    ${l}`).join('\n')}`);
-            const dialogs = await page.locator('[role="dialog"], [aria-modal="true"]').evaluateAll(
-              (els) => els.filter((el) => el.offsetParent !== null || getComputedStyle(el).position === 'fixed')
-                .map((el) => el.innerText.replace(/\s+/g, ' ').slice(0, 200)),
-            ).catch(() => []);
-            console.warn(`Sprouts: open popups: ${dialogs.length ? dialogs.map((d) => `"${d}"`).join(' | ') : 'none'}`);
-            const count = await page.getByRole('button', { name: t.name, exact: true }).count().catch(() => -1);
-            console.warn(`Sprouts: buttons matching that name: ${count}; viewport: ${JSON.stringify(page.viewportSize())}`);
-            try {
-              await page.screenshot({ path: 'windows/logs/sprouts-click.png', fullPage: false });
-              console.warn('Sprouts: saved screenshot to windows\\logs\\sprouts-click.png');
-            } catch { /* ignore */ }
-          }
+          // Something still covers the tile: click it directly in the page instead.
+          console.warn(`Sprouts: normal click on "${t.name}" blocked (${e.message.split('\n')[0]}); clicking directly`);
+          await btn.evaluate((el) => el.click()).catch(() => {});
+        }
+        for (let i = 0; i < 30 && !collectionUrl; i++) await page.waitForTimeout(500);
+        if (!collectionUrl) {
+          const popups = await openPopups(page);
+          console.warn(`Sprouts: ad tile "${t.name}" didn't open its products. Popups: ${popups.join(' | ') || 'none'}`);
         }
       }
       page.off('response', onResp);
