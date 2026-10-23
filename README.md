@@ -48,7 +48,7 @@ cd grocery-prices
 powershell -ExecutionPolicy Bypass -File windows\setup.ps1
 ```
 
-This registers **Grocery Prices Fetch** in Task Scheduler (6:40am and 6:40pm, or when the PC wakes). To move another store off GitHub, add it to `windows\chains.txt`.
+This registers **Grocery Prices Fetch** in Task Scheduler: 6:40am and 6:40pm daily, plus Wednesday 12:05am when Sprouts' new ad starts. It wakes the PC from sleep for these, and if the PC was off, runs once you turn it on and sign in. To move another store off GitHub, add it to `windows\chains.txt`.
 
 ## Notes
 
