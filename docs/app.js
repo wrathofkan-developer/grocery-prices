@@ -65,7 +65,7 @@ function priceTag(item) {
   }
   const sale = item.kind === 'sale';
   const per = item.price_per === 'lb' ? '<small>/lb</small>' : '';
-  const unit = item.price_per === 'lb' ? '' : unitLabel(item.unit_price);
+  const unit = item.price_per === 'lb' ? '' : unitLabel(item.unit_price, item);
   // Deal items show the price after the deal, plus one unit before it.
   let before = '';
   if (item.regular_price) {

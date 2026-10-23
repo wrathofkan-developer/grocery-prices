@@ -119,3 +119,15 @@ test('cut/form words: "Walnut Halves & Pieces" is walnuts', () => {
   ];
   assert.deepEqual(analyzeEntry(pool, { q: 'walnuts', qty: 1 }, today).active.map((i) => i.id).sort(), ['wb', 'wh']);
 });
+
+test('eggs show price per dozen', async () => {
+  const { mapItem } = await import('../src/fetchers/traderjoes.js');
+  const tj = indexItem(mapItem({ sku: '1', item_title: 'Pasture Raised Large Brown Eggs', retail_price: '5.99', sales_size: 1, sales_uom_description: 'Doz' }, [], '2026-10-23', 'Food'));
+  assert.deepEqual(tj.unit_price, { value: 5.99 / 12, unit: 'ct' });
+  assert.equal(unitLabel(tj.unit_price, tj), '$5.99/doz');
+  const sprouts18 = indexItem({ ...mk({ id: 's', chain: 'sprouts', name: 'Large Grade A Eggs', price: 6.99 }), unit_price: { value: 6.99 / 18, unit: 'ct' } });
+  assert.equal(unitLabel(sprouts18.unit_price, sprouts18), '$4.66/doz');
+  // Other counted items keep per-each.
+  const avo = indexItem({ ...mk({ id: 'a', chain: 'traderjoes', name: 'Avocados 4 count', price: 3.99 }), unit_price: { value: 3.99 / 4, unit: 'ct' } });
+  assert.equal(unitLabel(avo.unit_price, avo), '$1.00/ea');
+});

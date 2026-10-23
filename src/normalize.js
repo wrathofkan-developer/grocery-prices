@@ -5,6 +5,7 @@ const UNIT_ALIASES = [
   [/^(oz|ounces?)$/i, 'oz'],
   [/^(lbs?|pounds?)$/i, 'lb'],
   [/^(ct|count|pk|pack|ea|each|pcs?)$/i, 'ct'],
+  [/^(doz|dozen)$/i, 'doz'],
   [/^(gal|gallons?)$/i, 'gal'],
   [/^(qt|quarts?)$/i, 'qt'],
   [/^(pt|pints?)$/i, 'pt'],
@@ -26,7 +27,7 @@ export function canonicalUnit(u) {
 const TO_BASE = {
   oz: ['oz', 1], lb: ['oz', 16], g: ['oz', 1 / 28.3495], kg: ['oz', 35.274],
   fl_oz: ['fl_oz', 1], gal: ['fl_oz', 128], qt: ['fl_oz', 32], pt: ['fl_oz', 16], l: ['fl_oz', 33.814], ml: ['fl_oz', 1 / 29.5735],
-  ct: ['ct', 1],
+  ct: ['ct', 1], doz: ['ct', 12],
 };
 
 export function toBase(qty, unit) {
@@ -44,7 +45,7 @@ export function toBase(qty, unit) {
 export function parseSize(text) {
   if (!text) return null;
   const s = String(text).replace(/ /g, ' ');
-  const re = /(?:(\d+)\s*\/\s*)?(\d+(?:\.\d+)?)\s*-?\s*(fl\.?\s*oz|fluid\s*ounces?|oz|ounces?|lbs?|pounds?|ct|count|pk|gal(?:lons?)?|qt|quarts?|ml|kg|g|l|liters?)\.?\b/i;
+  const re = /(?:(\d+)\s*\/\s*)?(\d+(?:\.\d+)?)\s*-?\s*(fl\.?\s*oz|fluid\s*ounces?|oz|ounces?|lbs?|pounds?|ct|count|pk|doz(?:en)?|gal(?:lons?)?|qt|quarts?|ml|kg|g|l|liters?)\.?\b/i;
   const m = s.match(re);
   if (!m) return null;
   const packs = m[1] ? Number(m[1]) : 1;

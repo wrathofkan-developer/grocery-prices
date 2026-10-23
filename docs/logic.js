@@ -392,9 +392,17 @@ export function nearestStore(item, storesById, here) {
 export const money = (n) => `$${n.toFixed(2)}`;
 
 const UNIT_LABEL = { oz: 'oz', fl_oz: 'fl oz', ct: 'ea' };
-export function unitLabel(up) {
+
+/** Things people price by the dozen. */
+const BY_DOZEN = new Set(['egg']);
+
+/** Unit price label. Eggs show per dozen ("$5.99/doz") so 12- and 18-packs compare at a glance. */
+export function unitLabel(up, item) {
   if (!up) return '';
   const v = up.value;
+  if (up.unit === 'ct' && item?._heads && [...BY_DOZEN].some((h) => item._heads.has(h))) {
+    return `$${(v * 12).toFixed(2)}/doz`;
+  }
   return v >= 0.995 ? `$${v.toFixed(2)}/${UNIT_LABEL[up.unit]}` : `${(v * 100).toFixed(1)}¢/${UNIT_LABEL[up.unit]}`;
 }
 
