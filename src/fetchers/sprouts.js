@@ -193,6 +193,7 @@ export async function fetchSprouts(stores) {
 
       // Open one tile to learn the product-panel request, then load every tile's products.
       const tiles = res.items.filter((t) => t.collection_id);
+      let diagnosed = false;
       for (const t of tiles.slice(0, 3)) {
         if (collectionUrl) break;
         try {
@@ -200,6 +201,22 @@ export async function fetchSprouts(stores) {
           for (let i = 0; i < 30 && !collectionUrl; i++) await page.waitForTimeout(500);
         } catch (e) {
           console.warn(`Sprouts: couldn't open ad tile "${t.name}" (${e.message.split('\n')[0]})`);
+          if (!diagnosed) {
+            // Diagnostics: what does the page look like, and why did the click fail?
+            diagnosed = true;
+            console.warn(`Sprouts: click details:\n${e.message.split('\n').slice(0, 25).map((l) => `    ${l}`).join('\n')}`);
+            const dialogs = await page.locator('[role="dialog"], [aria-modal="true"]').evaluateAll(
+              (els) => els.filter((el) => el.offsetParent !== null || getComputedStyle(el).position === 'fixed')
+                .map((el) => el.innerText.replace(/\s+/g, ' ').slice(0, 200)),
+            ).catch(() => []);
+            console.warn(`Sprouts: open popups: ${dialogs.length ? dialogs.map((d) => `"${d}"`).join(' | ') : 'none'}`);
+            const count = await page.getByRole('button', { name: t.name, exact: true }).count().catch(() => -1);
+            console.warn(`Sprouts: buttons matching that name: ${count}; viewport: ${JSON.stringify(page.viewportSize())}`);
+            try {
+              await page.screenshot({ path: 'windows/logs/sprouts-click.png', fullPage: false });
+              console.warn('Sprouts: saved screenshot to windows\\logs\\sprouts-click.png');
+            } catch { /* ignore */ }
+          }
         }
       }
       page.off('response', onResp);
