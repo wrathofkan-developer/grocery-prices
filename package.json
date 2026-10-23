@@ -1,0 +1,21 @@
+{
+  "name": "grocery-prices",
+  "version": "1.0.0",
+  "description": "Local grocery price tracker: weekly ads + regular prices",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "fetch": "node src/run.js",
+    "fetch:cloud": "node src/run.js safeway traderjoes costco",
+    "fetch:sprouts": "node src/run.js sprouts"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "node-html-parser": "^6.1.13"
+  },
+  "type": "module",
+  "private": true
+}

@@ -1,0 +1,14 @@
+{
+  "region": "South San Francisco / Daly City",
+  "stores": [
+    { "id": "safeway-3031", "chain": "safeway", "storeCode": "3031", "postal": "94015", "name": "Safeway Westlake", "address": "601 Westlake Ctr, Daly City, CA 94015", "lat": 37.69961, "lng": -122.48156 },
+    { "id": "safeway-3116", "chain": "safeway", "storeCode": "3116", "postal": "94080", "name": "Safeway Gellert", "address": "2255 Gellert Blvd, South San Francisco, CA 94080", "lat": 37.64659, "lng": -122.45203 },
+    { "id": "safeway-2740", "chain": "safeway", "storeCode": "2740", "postal": "94080", "name": "Safeway El Camino", "address": "190 El Camino Real, South San Francisco, CA 94080", "lat": 37.64250, "lng": -122.42436 },
+    { "id": "safeway-2843", "chain": "safeway", "storeCode": "2843", "postal": "94044", "name": "Safeway Hickey", "address": "709 Hickey Blvd, Pacifica, CA 94044", "lat": 37.66112, "lng": -122.47769 },
+    { "id": "traderjoes-74", "chain": "traderjoes", "storeCode": "74", "name": "Trader Joe's Daly City", "address": "417 Westlake Center, Daly City, CA 94015", "lat": 37.70000, "lng": -122.48224 },
+    { "id": "traderjoes-187", "chain": "traderjoes", "storeCode": "187", "name": "Trader Joe's South SF", "address": "301 McLellan Dr, South San Francisco, CA 94080", "lat": 37.66474, "lng": -122.44610 },
+    { "id": "traderjoes-170", "chain": "traderjoes", "storeCode": "170", "name": "Trader Joe's Millbrae", "address": "765 Broadway, Millbrae, CA 94030", "lat": 37.60365, "lng": -122.39603 },
+    { "id": "sprouts-276", "chain": "sprouts", "storeCode": "276", "name": "Sprouts Daly City", "address": "301 Gellert Blvd, Daly City, CA 94015", "lat": 37.66884, "lng": -122.46696 },
+    { "id": "costco-422", "chain": "costco", "storeCode": "422", "name": "Costco South SF", "address": "451 S Airport Blvd, South San Francisco, CA 94080", "lat": 37.64221, "lng": -122.40102, "note": "Savings book not valid at the South SF Business Center (#654)" }
+  ]
+}
