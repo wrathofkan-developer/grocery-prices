@@ -37,9 +37,12 @@
 <main>
   <section id="view-list" role="tabpanel" aria-labelledby="tab-list">
     <form id="addForm" class="add" autocomplete="off">
-      <label for="addInput" class="sr-only">Add an item</label>
-      <input id="addInput" type="text" placeholder="Add an item, like oat milk or eggs" enterkeyhint="done" list="suggest">
-      <datalist id="suggest"></datalist>
+      <div class="combo">
+        <label for="addInput" class="sr-only">Add an item</label>
+        <input id="addInput" type="text" placeholder="Add an item, like oat milk or eggs" enterkeyhint="done"
+          role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggestBox" autocapitalize="none" spellcheck="false">
+        <ul id="suggestBox" class="suggest" role="listbox" aria-label="Suggestions" hidden></ul>
+      </div>
       <button type="submit">Add</button>
     </form>
     <ol id="list" class="list"></ol>

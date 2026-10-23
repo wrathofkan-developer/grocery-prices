@@ -37,18 +37,151 @@ export function tokens(s) {
     .map(singular);
 }
 
+// Words that end a name without being the thing itself ("Milk Half gallon", "Thighs Value Pack").
+const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', 'pack', 'value', 'family', 'size', 'bag', 'box', 'bottle', 'jar', 'can', 'carton', 'dozen', 'large', 'small', 'medium', 'organic', 'fresh', 'frozen', 'pk', 'each', 'ea', 'roll', 'mega']);
+
+/**
+ * The head noun of each product in a name. Ad copy can list several products
+ * ("Nature Valley Bars. Lucerne Milk Half gallon. Chex Cereal"), so split first.
+ */
+function heads(name) {
+  const out = new Set();
+  for (const seg of String(name).split(/[.,;]|\bor\b|\band\b/i)) {
+    // "Greek Yogurt Made with Whole Milk" is yogurt: the thing comes before "with".
+    const core = seg.split(/\b(?:made with|with|w\/)\b/i)[0];
+    const t = tokens(core).filter((w) => !/^\d/.test(w));
+    while (t.length && TAIL_NOISE.has(t[t.length - 1])) t.pop();
+    if (!t.length) continue;
+    out.add(t[t.length - 1]);
+    if (t.length > 1) out.add(t[t.length - 2] + t[t.length - 1]); // "oat milk" -> "oatmilk"
+  }
+  return out;
+}
+
 /** Pre-compute search keys once per item. */
 export function indexItem(item) {
   const t = tokens(`${item.name} ${item.brand || ''}`);
-  return { ...item, _tok: t, _joined: t.join('') };
+  return { ...item, _tok: t, _joined: t.join(''), _heads: heads(item.name) };
 }
 
-/** Every query word must start some word in the item ("oat milk" also matches "oatmilk"). */
+/** Loose prefix match, used only while typing to build suggestions. */
 export function matches(item, qTokens) {
   if (!qTokens.length) return false;
   const allWords = qTokens.every((q) => item._tok.some((w) => w.startsWith(q)));
   if (allWords) return true;
   return qTokens.length > 1 && item._joined.includes(qTokens.join(''));
+}
+
+/**
+ * Plain item ("eggs", "milk", "oat milk"): the item must BE that thing — the
+ * term's last word is a product's head noun. Egg Nog (head: nog), Eggplant,
+ * Eggo and Whole Milk Yogurt (head: yogurt) don't count.
+ */
+export function matchesGeneric(item, termTokens) {
+  if (!termTokens.length) return false;
+  const joined = termTokens.join('');
+  const last = termTokens[termTokens.length - 1];
+  if (item._heads.has(joined)) return true; // "oatmilk" head for "oat milk"
+  if (!item._heads.has(last)) return false;
+  return termTokens.every((w) => item._tok.includes(w));
+}
+
+/** Specific product ("Egg Nog"): the words appear together, in order, at any store. */
+export function matchesPhrase(item, phraseTokens) {
+  const n = phraseTokens.length;
+  if (!n) return false;
+  for (let i = 0; i + n <= item._tok.length; i++) {
+    let ok = true;
+    for (let j = 0; j < n; j++) if (item._tok[i + j] !== phraseTokens[j]) { ok = false; break; }
+    if (ok) return true;
+  }
+  return false;
+}
+
+export function entryMatcher(entry) {
+  const t = tokens(entry.q);
+  return entry.mode === 'product' ? (it) => matchesPhrase(it, t) : (it) => matchesGeneric(it, t);
+}
+
+// Common things people put on a grocery list. These are offered first as plain
+// choices, even when no store has a price for them yet.
+export const STAPLES = [
+  'eggs', 'milk', 'whole milk', 'oat milk', 'almond milk', 'soy milk', 'half and half', 'heavy cream', 'butter', 'cheese',
+  'cheddar cheese', 'mozzarella', 'parmesan', 'cream cheese', 'sour cream', 'yogurt', 'greek yogurt', 'cottage cheese',
+  'bread', 'bagels', 'tortillas', 'english muffins', 'buns', 'croissants',
+  'bananas', 'apples', 'oranges', 'lemons', 'limes', 'grapes', 'strawberries', 'blueberries', 'raspberries', 'avocados',
+  'tomatoes', 'potatoes', 'sweet potatoes', 'onions', 'garlic', 'carrots', 'celery', 'broccoli', 'cauliflower', 'spinach',
+  'lettuce', 'kale', 'cucumbers', 'bell peppers', 'mushrooms', 'zucchini', 'corn', 'green beans', 'asparagus', 'cilantro',
+  'chicken breast', 'chicken thighs', 'whole chicken', 'ground beef', 'steak', 'pork chops', 'bacon', 'sausage', 'ham',
+  'turkey', 'ground turkey', 'salmon', 'shrimp', 'tuna', 'tofu', 'hot dogs', 'deli meat',
+  'rice', 'pasta', 'spaghetti', 'noodles', 'ramen', 'oats', 'oatmeal', 'cereal', 'granola', 'flour', 'sugar', 'brown sugar',
+  'salt', 'pepper', 'olive oil', 'vegetable oil', 'vinegar', 'soy sauce', 'ketchup', 'mustard', 'mayonnaise', 'hot sauce',
+  'salsa', 'hummus', 'peanut butter', 'jam', 'honey', 'maple syrup', 'beans', 'black beans', 'chickpeas', 'canned tomatoes',
+  'tomato sauce', 'pasta sauce', 'broth', 'chicken broth', 'soup', 'crackers', 'chips', 'tortilla chips', 'pretzels',
+  'popcorn', 'cookies', 'nuts', 'almonds', 'walnuts', 'cashews', 'trail mix', 'granola bars', 'chocolate',
+  'coffee', 'tea', 'orange juice', 'apple juice', 'sparkling water', 'water', 'soda', 'kombucha', 'beer', 'wine',
+  'ice cream', 'frozen pizza', 'frozen vegetables', 'frozen fruit', 'waffles', 'dumplings',
+  'paper towels', 'toilet paper', 'trash bags', 'dish soap', 'laundry detergent', 'aluminum foil', 'zip bags', 'napkins',
+  'diapers', 'wipes', 'toothpaste', 'shampoo', 'body wash', 'dog food', 'cat food',
+];
+const STAPLE_TOKENS = STAPLES.map((s) => ({ label: s, t: tokens(s) }));
+
+/** Short display name for a product: first clause of ad copy, a few words. */
+export function shortName(name) {
+  const first = String(name).split(/[.,(]/)[0].replace(/[®™]/g, '').trim();
+  return first.split(/\s+/).slice(0, 9).join(' ');
+}
+
+/**
+ * Suggestions while typing. Plain staples first ("eggs"), then specific
+ * products containing the text ("Egg Nog", "Eggo Waffles"), each with its
+ * lowest current price and how many store chains carry it.
+ */
+export function suggest(items, text, today, { maxStaples = 3, maxProducts = 7 } = {}) {
+  const q = tokens(text);
+  if (!q.length) return [];
+  const raw = String(text).trim().toLowerCase();
+  const prefixAll = (t) => q.every((w) => t.some((x) => x.startsWith(w)));
+
+  const live = items.filter((i) => priceStatus(i, today) === 'active');
+  const generic = STAPLE_TOKENS
+    .filter((s) => prefixAll(s.t))
+    .sort((a, b) => (b.label.startsWith(raw) - a.label.startsWith(raw)) || a.t.length - b.t.length || a.label.localeCompare(b.label))
+    .slice(0, maxStaples)
+    .map((s) => {
+      const hits = live.filter((i) => matchesGeneric(i, s.t) && i.price != null);
+      const low = hits.reduce((m, i) => (m == null || i.price < m ? i.price : m), null);
+      return { type: 'generic', q: s.label, label: s.label, count: hits.length, low, chains: [...new Set(hits.map((i) => i.chain))] };
+    });
+
+  // Group products by their short name so the same product at 3 stores is one row.
+  const groups = new Map();
+  for (const it of live) {
+    if (!matches(it, q)) continue;
+    const name = shortName(it.name);
+    const key = tokens(name).join(' ');
+    if (!key || generic.some((g) => tokens(g.q).join(' ') === key)) continue;
+    if (!groups.has(key)) groups.set(key, { type: 'product', q: name, label: name, items: [] });
+    groups.get(key).items.push(it);
+  }
+  const products = [...groups.values()].map((g) => {
+    const priced = g.items.filter((i) => i.price != null);
+    const nameTok = tokens(g.label);
+    return {
+      ...g,
+      low: priced.reduce((m, i) => (m == null || i.price < m ? i.price : m), null),
+      chains: [...new Set(g.items.map((i) => i.chain))],
+      // Whole word ("Egg Nog") before partial ("Eggplant"); earlier position first.
+      whole: q.every((w) => nameTok.includes(w)) ? 1 : 0,
+      pos: nameTok.findIndex((x) => x.startsWith(q[0])),
+    };
+  });
+  products.sort((a, b) => b.whole - a.whole || a.pos - b.pos || b.chains.length - a.chains.length || a.label.localeCompare(b.label));
+
+  const out = [...generic, ...products.slice(0, maxProducts)];
+  // Nothing in the staples list: still offer exactly what was typed as a plain item.
+  if (!generic.length) out.unshift({ type: 'generic', q: String(text).trim(), label: String(text).trim(), count: null, low: null, chains: [] });
+  return out;
 }
 
 /** Lower is better: unit price when two items share a unit, else shelf price. */
@@ -62,12 +195,12 @@ export function compareValue(a, b) {
   return a.price - b.price;
 }
 
-export function findMatches(items, query, today) {
-  const q = tokens(query);
+export function findMatches(items, entry, today) {
+  const test = entryMatcher(entry);
   const out = [];
   for (const it of items) {
     if (priceStatus(it, today) === 'expired') continue;
-    if (matches(it, q)) out.push(it);
+    if (test(it)) out.push(it);
   }
   return out;
 }
@@ -77,7 +210,7 @@ export function findMatches(items, query, today) {
  * and any upcoming ad price that beats today's best.
  */
 export function analyzeEntry(items, entry, today) {
-  const all = findMatches(items, entry.q, today);
+  const all = findMatches(items, entry, today);
   const active = all.filter((i) => priceStatus(i, today) === 'active').sort(compareValue);
   const upcoming = all.filter((i) => priceStatus(i, today) === 'upcoming').sort(compareValue);
   const perChain = {};

@@ -1,6 +1,7 @@
 import {
   CHAINS, todayPT, priceStatus, indexItem, analyzeEntry, estimate, oneStopTrips,
-  nearestStore, miles, money, unitLabel, dayLabel, rangeLabel, ago, tokens, matches, compareValue, lineCost,
+  nearestStore, miles, money, unitLabel, dayLabel, rangeLabel, ago, tokens, matches, compareValue,
+  suggest, shortName,
 } from './logic.js';
 
 const DEFAULT_HERE = { lat: 37.6547, lng: -122.4508, label: 'Near South SF' };
@@ -48,15 +49,6 @@ async function load() {
     }
     if (statuses[i].status === 'fulfilled') data.status[c] = statuses[i].value;
   });
-  fillSuggestions();
-}
-
-function fillSuggestions() {
-  // A few hundred common words from item names for the add box.
-  const counts = new Map();
-  for (const it of data.items) for (const w of it.name.toLowerCase().split(/[^a-z]+/)) if (w.length > 3) counts.set(w, (counts.get(w) || 0) + 1);
-  const words = [...counts].filter(([, n]) => n > 2).sort((a, b) => b[1] - a[1]).slice(0, 300).map(([w]) => w).sort();
-  $('#suggest').innerHTML = words.map((w) => `<option value="${esc(w)}">`).join('');
 }
 
 // ---------- shared bits ----------
@@ -110,7 +102,7 @@ function rowHtml(e, a, i) {
     ? `<p class="row-where">${dot(c.chain)}<b>${esc(c.name)}</b><br>${whereText(c)}${untilText(c)}${a.pinned ? ' · your pick' : ''}</p>`
     : a.active.length
       ? `<p class="row-where">${a.active.length} ad mention${a.active.length > 1 ? 's' : ''} without a listed price</p>`
-      : `<p class="nomatch">Nothing matches "${esc(e.q)}" at these stores right now. Try a shorter name.</p>`;
+      : `<p class="nomatch">No store has a price for ${esc(e.q)} this week.</p>`;
 
   return `<li class="row" data-id="${e.id}">
     <div class="row-head">
@@ -225,11 +217,6 @@ function renderDeals() {
     (total > shown ? `<button type="button" class="more" data-act="more">Show more (${total - shown} left)</button>` : '');
 }
 
-/** "Oatly Oatmilk" stays; long ad copy trimmed to its first few words. */
-function shortName(name) {
-  return name.split(/[.,(]/)[0].split(/\s+/).slice(0, 4).join(' ');
-}
-
 // ---------- stores view ----------
 function renderStores() {
   const parts = [];
@@ -268,16 +255,87 @@ function render() {
   if (state.tab === 'stores') { renderStores(); renderList(); }
 }
 
-$('#addForm').addEventListener('submit', (ev) => {
+// ---------- add box with suggestions ----------
+// The person picks what they mean before anything is added:
+// a plain item ("eggs" = things that ARE eggs) or a specific product ("Egg Nog").
+const input = $('#addInput');
+const box = $('#suggestBox');
+let opts = [];
+let activeOpt = 0;
+
+function renderSuggest() {
+  const text = input.value.trim();
+  opts = text ? suggest(data.items, text, today) : [];
+  activeOpt = 0;
+  if (!opts.length) return closeSuggest();
+  const firstProduct = opts.findIndex((o) => o.type === 'product');
+  box.innerHTML = opts.map((o, i) => {
+    const sep = i === firstProduct && i > 0 ? '<li class="opt-sep" role="presentation"></li>' : '';
+    let meta;
+    if (o.type === 'generic') {
+      meta = o.count ? `${o.count} match${o.count > 1 ? 'es' : ''} at ${o.chains.map((c) => CHAINS[c].name).join(', ')}`
+        : o.count === 0 ? 'No store has a price this week' : 'Add as typed';
+    } else {
+      meta = o.chains.map((c) => `${dot(c)}${CHAINS[c].name}`).join('&ensp;');
+    }
+    const price = o.low != null ? `<span class="opt-price">${o.type === 'generic' ? 'from ' : ''}${money(o.low)}</span>` : '';
+    return `${sep}<li id="opt-${i}" class="opt ${o.type}" role="option" aria-selected="${i === activeOpt}" data-i="${i}">
+      <span class="opt-name">${esc(o.label)}</span>${price}<span class="opt-meta">${meta}</span></li>`;
+  }).join('');
+  box.hidden = false;
+  input.setAttribute('aria-expanded', 'true');
+  input.setAttribute('aria-activedescendant', `opt-${activeOpt}`);
+}
+
+function closeSuggest() {
+  box.hidden = true;
+  box.innerHTML = '';
+  input.setAttribute('aria-expanded', 'false');
+  input.removeAttribute('aria-activedescendant');
+}
+
+function moveActive(d) {
+  if (!opts.length) return;
+  activeOpt = (activeOpt + d + opts.length) % opts.length;
+  for (const el of box.querySelectorAll('.opt')) el.setAttribute('aria-selected', String(Number(el.dataset.i) === activeOpt));
+  box.querySelector(`#opt-${activeOpt}`)?.scrollIntoView({ block: 'nearest' });
+  input.setAttribute('aria-activedescendant', `opt-${activeOpt}`);
+}
+
+function choose(o) {
+  addItem(o.q, o.type === 'product' ? 'product' : 'generic');
+  input.value = '';
+  closeSuggest();
+}
+
+let typeTimer;
+input.addEventListener('input', () => { clearTimeout(typeTimer); typeTimer = setTimeout(renderSuggest, 80); });
+input.addEventListener('focus', () => { if (input.value.trim()) renderSuggest(); });
+input.addEventListener('blur', () => setTimeout(closeSuggest, 150));
+input.addEventListener('keydown', (ev) => {
+  if (ev.key === 'ArrowDown') { ev.preventDefault(); if (box.hidden) renderSuggest(); else moveActive(1); }
+  else if (ev.key === 'ArrowUp') { ev.preventDefault(); moveActive(-1); }
+  else if (ev.key === 'Escape') closeSuggest();
+});
+// pointerdown so the pick lands before the input's blur closes the list.
+box.addEventListener('pointerdown', (ev) => {
+  const li = ev.target.closest('.opt');
+  if (!li) return;
   ev.preventDefault();
-  const q = $('#addInput').value.trim();
-  if (!q) return;
-  addItem(q);
-  $('#addInput').value = '';
+  choose(opts[Number(li.dataset.i)]);
 });
 
-function addItem(q) {
-  state.list.push({ id: Math.random().toString(36).slice(2, 9), q, qty: 1, pin: null });
+$('#addForm').addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const text = input.value.trim();
+  if (!text) return;
+  if (!opts.length) opts = suggest(data.items, text, today);
+  // Enter (or Add) takes the highlighted suggestion; top one is the plain item.
+  choose(opts[activeOpt] || { type: 'generic', q: text });
+});
+
+function addItem(q, mode = 'generic') {
+  state.list.push({ id: Math.random().toString(36).slice(2, 9), q, mode, qty: 1, pin: null });
   saveList();
   render();
 }
@@ -295,7 +353,7 @@ document.addEventListener('click', (ev) => {
   else if (act === 'remove') { state.list.splice(i, 1); }
   else if (act === 'toggle') { state.open = state.open === e.id ? null : e.id; }
   else if (act === 'pin') { e.pin = e.pin === b.dataset.item ? null : b.dataset.item; }
-  else if (act === 'add-deal') { addItem(b.dataset.name); b.textContent = 'Added'; return; }
+  else if (act === 'add-deal') { addItem(b.dataset.name, 'product'); b.textContent = 'Added'; return; }
   else if (act === 'more') { state.dealLimit += 60; return renderDeals(); }
   else return;
   saveList();
