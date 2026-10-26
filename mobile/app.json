@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Grocery Prices",
+    "slug": "grocery-prices",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.wrathofkan.groceryprices"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1E7A4C",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.wrathofkan.groceryprices"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "single",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Grocery Prices uses your location to find nearby stores."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Take a picture of a price tag or receipt to share a price.",
+          "photosPermission": "Choose a photo of a price tag or receipt to share a price."
+        }
+      ],
+      "expo-font"
+    ],
+    "scheme": "groceryprices",
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
