@@ -88,3 +88,16 @@ test('"and" inside one product name is not two products ("Apple and Walnut Oatme
   assert.deepEqual(a.active.map((i) => i.id), ['kroger-70400351-g']);
   assert.equal(analyzeEntry(items, { q: 'oatmeal', qty: 1 }, '2026-10-26').chosen.id, 'kroger-70400351-o');
 });
+
+test('suggestions name the store you\'d shop at (Foods Co), not the parent company', async () => {
+  const { suggest } = await import('../docs/logic.js');
+  const stores = { 'kroger-70400351': { banner: 'Foods Co', tz: 'America/Los_Angeles' } };
+  const ctx = { storeId: 'kroger-70400351', today: '2026-10-26' };
+  const items = [product({ id: 'f', name: 'Fuji Apples', size: '1 lb', soldBy: 'WEIGHT', regular: 1.99 })].map((p) => indexItem(mapProduct(p, ctx), stores));
+  const labelOf = (it) => stores[it.stores[0]]?.banner || it.chain;
+  const s = suggest(items, 'fuji', '2026-10-26', { labelOf });
+  const fuji = s.find((o) => o.type === 'product');
+  assert.deepEqual(fuji.stores, [{ name: 'Foods Co', chain: 'kroger' }]);
+  const plain = suggest(items, 'apple', '2026-10-26', { labelOf })[0];
+  assert.deepEqual(plain.stores, ['Foods Co']);
+});

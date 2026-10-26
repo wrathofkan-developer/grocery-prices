@@ -284,7 +284,8 @@ function renderTotal(analyses) {
 function renderDeals() {
   const sale = data.items.filter((it) => it.kind === 'sale');
   const present = Object.keys(CHAINS).filter((k) => sale.some((it) => it.chain === k));
-  const chips = [['all', 'All stores'], ...present.map((k) => [k, CHAINS[k].name])];
+  const chipName = (k) => [...new Set(sale.filter((it) => it.chain === k).map(labelFor))].join(' / ') || CHAINS[k].name;
+  const chips = [['all', 'All stores'], ...present.map((k) => [k, chipName(k)])];
   $('#chainFilter').innerHTML = chips
     .map(([k, label]) => `<button type="button" class="chip" data-chain="${k}" aria-pressed="${state.dealChain === k}">${k === 'all' ? '' : dot(k)}${esc(label)}</button>`)
     .join('');
@@ -308,7 +309,7 @@ function renderDeals() {
       ? ads.map((i) => `${esc(i.ad_name || 'Ad')}: ${rangeLabel(i.valid_from, i.valid_to)}`).join('<br>')
       : chain === 'kroger' ? 'Sale prices for items on your list' : '';
     list.sort((a, b) => (a.price == null) - (b.price == null) || a.name.localeCompare(b.name));
-    groups.push({ chain, title: chainName(chain, list.map(labelFor)[0]), windows, list });
+    groups.push({ chain, title: [...new Set(list.map(labelFor))].join(' / '), windows, list });
   }
   if (upcoming.length) {
     const starts = [...new Set(upcoming.map((i) => i.valid_from))].sort();
@@ -404,7 +405,7 @@ let activeOpt = 0;
 
 function renderSuggest() {
   const text = input.value.trim();
-  opts = text ? suggest(data.items, text) : [];
+  opts = text ? suggest(data.items, text, undefined, { labelOf: labelFor }) : [];
   activeOpt = 0;
   if (!opts.length) return closeSuggest();
   const firstProduct = opts.findIndex((o) => o.type === 'product');
@@ -412,10 +413,10 @@ function renderSuggest() {
     const sep = i === firstProduct && i > 0 ? '<li class="opt-sep" role="presentation"></li>' : '';
     let meta;
     if (o.type === 'generic') {
-      meta = o.count ? `${o.count} match${o.count > 1 ? 'es' : ''} at ${o.chains.map((c) => esc(CHAINS[c]?.name || c)).join(', ')}`
+      meta = o.count ? `${o.count} match${o.count > 1 ? 'es' : ''} at ${o.stores.map(esc).join(', ')}`
         : o.count === 0 ? 'No store has a price this week' : 'Add as typed';
     } else {
-      meta = o.chains.map((c) => `${dot(c)}${esc(CHAINS[c]?.name || c)}`).join('&ensp;');
+      meta = o.stores.map((st) => `${dot(st.chain)}${esc(st.name)}`).join('&ensp;');
     }
     const price = o.low != null ? `<span class="opt-price">${money(o.low)}</span>` : '';
     return `${sep}<li id="opt-${i}" class="opt ${o.type}" role="option" aria-selected="${i === activeOpt}" data-i="${i}">
@@ -468,7 +469,7 @@ $('#addForm').addEventListener('submit', (ev) => {
   ev.preventDefault();
   const text = input.value.trim();
   if (!text) return;
-  if (!opts.length) opts = suggest(data.items, text);
+  if (!opts.length) opts = suggest(data.items, text, undefined, { labelOf: labelFor });
   // Enter (or Add) takes the highlighted suggestion; top one is the plain item.
   choose(opts[activeOpt] || { type: 'generic', q: text });
 });

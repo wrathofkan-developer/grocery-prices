@@ -238,7 +238,7 @@ export function shortName(name) {
  * products containing the text ("Egg Nog", "Eggo Waffles"), each with its
  * lowest current price and how many store chains carry it.
  */
-export function suggest(items, text, today, { maxStaples = 3, maxProducts = 7 } = {}) {
+export function suggest(items, text, today, { maxStaples = 3, maxProducts = 7, labelOf = (it) => CHAINS[it.chain]?.name || it.chain } = {}) {
   const q = tokens(text);
   if (!q.length) return [];
   const raw = String(text).trim().toLowerCase();
@@ -254,7 +254,7 @@ export function suggest(items, text, today, { maxStaples = 3, maxProducts = 7 } 
       const hits = live.filter((i) => matchesGeneric(i, s.t) && i.price != null).sort(cmp);
       // Price shown is the basic pick's, the same one the list will use.
       const low = hits.length ? hits[0].price : null;
-      return { type: 'generic', q: s.label, label: s.label, count: hits.length, low, chains: [...new Set(hits.map((i) => i.chain))] };
+      return { type: 'generic', q: s.label, label: s.label, count: hits.length, low, chains: [...new Set(hits.map((i) => i.chain))], stores: [...new Set(hits.map(labelOf))] };
     });
 
   // Group products by their short name so the same product at 3 stores is one row.
@@ -274,6 +274,8 @@ export function suggest(items, text, today, { maxStaples = 3, maxProducts = 7 } 
       ...g,
       low: priced.reduce((m, i) => (m == null || i.price < m ? i.price : m), null),
       chains: [...new Set(g.items.map((i) => i.chain))],
+      // Store names to show: a Kroger item at Foods Co says "Foods Co", not "Kroger".
+      stores: [...new Map(g.items.map((i) => [labelOf(i), i.chain])).entries()].map(([name, chain]) => ({ name, chain })),
       // Whole word ("Egg Nog") before partial ("Eggplant"); earlier position first.
       whole: q.every((w) => nameTok.includes(w)) ? 1 : 0,
       pos: nameTok.findIndex((x) => x.startsWith(q[0])),
@@ -283,7 +285,7 @@ export function suggest(items, text, today, { maxStaples = 3, maxProducts = 7 } 
 
   const out = [...generic, ...products.slice(0, maxProducts)];
   // Nothing in the staples list: still offer exactly what was typed as a plain item.
-  if (!generic.length) out.unshift({ type: 'generic', q: String(text).trim(), label: String(text).trim(), count: null, low: null, chains: [] });
+  if (!generic.length) out.unshift({ type: 'generic', q: String(text).trim(), label: String(text).trim(), count: null, low: null, chains: [], stores: [] });
   return out;
 }
 
