@@ -95,17 +95,16 @@ async function products(p: URLSearchParams) {
   if (!ids.length) return { items: [] };
   const { data: rows } = await db.from('stores').select('id, tz').in('id', ids);
   const tzOf = Object.fromEntries((rows || []).map((r) => [r.id, r.tz]));
-  const items = [];
-  for (const storeId of ids) {
+  // Search every store at the same time (Kroger takes ~2s per search).
+  const lists = await Promise.all(ids.map((storeId) => {
     const loc = storeId.slice('kroger-'.length);
-    const list = await cached(`prod:${loc}:${term}`, 12 * HOUR, async () => {
+    return cached(`prod:${loc}:${term}`, 12 * HOUR, async () => {
       const j = await kroger('/products', { 'filter.term': term, 'filter.locationId': loc, 'filter.limit': 25 });
       const today = todayIn(tzOf[storeId] || 'America/New_York');
       return (j.data || []).map((x: unknown) => mapProduct(x, { storeId, today })).filter(Boolean);
     });
-    items.push(...list);
-  }
-  return { items };
+  }));
+  return { items: lists.flat() };
 }
 
 Deno.serve(async (req) => {
