@@ -2,12 +2,14 @@
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Slider from '@react-native-community/slider';
 import { useAppData } from '../state/AppData';
 import { useTheme, font } from '../theme';
 
 export default function Header({ title = 'Grocery prices' }) {
   const t = useTheme();
-  const { here, setZip, locateMe, loading } = useAppData();
+  const { here, setZip, locateMe, loading, radius, setRadius } = useAppData();
+  const [miles, setMiles] = useState(radius);
   const [open, setOpen] = useState(false);
   const [zip, setZipText] = useState('');
   const [err, setErr] = useState(null);
@@ -23,13 +25,13 @@ export default function Header({ title = 'Grocery prices' }) {
     <View style={styles.header}>
       <Text style={[styles.title, { color: t.ink }]}>{title}</Text>
       <Pressable
-        onPress={() => { setZipText(here.zip || ''); setErr(null); setOpen(true); }}
+        onPress={() => { setZipText(here.zip || ''); setMiles(radius); setErr(null); setOpen(true); }}
         style={[styles.chip, { borderColor: t.line, backgroundColor: t.surface }]}
         accessibilityRole="button"
-        accessibilityLabel={`Location: ${here.label}. Change`}
+        accessibilityLabel={`Location: ${here.label}, within ${radius} miles. Change`}
       >
         {loading ? <ActivityIndicator size="small" color={t.muted} /> : <Ionicons name="location-sharp" size={14} color={t.muted} />}
-        <Text style={[styles.chipText, { color: t.muted }]}>{here.label}</Text>
+        <Text style={[styles.chipText, { color: t.muted }]} numberOfLines={1}>{here.label} · {radius} mi</Text>
       </Pressable>
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
@@ -46,6 +48,23 @@ export default function Header({ title = 'Grocery prices' }) {
               placeholderTextColor={t.muted}
               style={[styles.input, { borderColor: t.line, backgroundColor: t.bg, color: t.ink }]}
               accessibilityLabel="ZIP code"
+            />
+            <View style={styles.distRow}>
+              <Text style={[styles.fieldLabel, { color: t.ink }]}>Distance</Text>
+              <Text style={[styles.distVal, { color: t.ink }]}>{miles} mi</Text>
+            </View>
+            {/* Applies when you let go, without changing your ZIP. */}
+            <Slider
+              minimumValue={1}
+              maximumValue={25}
+              step={1}
+              value={radius}
+              onValueChange={(v) => setMiles(Math.round(v))}
+              onSlidingComplete={(v) => setRadius(Math.round(v))}
+              minimumTrackTintColor={t.green}
+              maximumTrackTintColor={t.line}
+              thumbTintColor={t.green}
+              accessibilityLabel="Distance in miles"
             />
             {err && <Text style={[styles.err, { color: t.warn }]}>{err}</Text>}
             <View style={styles.actions}>
@@ -80,6 +99,8 @@ const styles = StyleSheet.create({
   sheetTitle: { fontFamily: font.numBold, fontSize: 24 },
   fieldLabel: { fontFamily: font.bodyMedium, fontSize: 14 },
   input: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 11, fontSize: 17, fontFamily: font.body },
+  distRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 4 },
+  distVal: { fontFamily: font.num, fontSize: 19 },
   err: { fontFamily: font.body, fontSize: 14 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
   btn: { borderWidth: 1, borderColor: 'transparent', borderRadius: 10, paddingHorizontal: 16, paddingVertical: 11 },

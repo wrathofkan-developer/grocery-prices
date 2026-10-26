@@ -58,7 +58,7 @@ export async function nearbyStores(here, miles = 15) {
   const c = await client();
   const [own, kroger] = await Promise.all([
     c.rpc('stores_near', { p_lat: here.lat, p_lng: here.lng, p_miles: miles }),
-    krogerStores(here, Math.min(miles, 15)).catch(() => []), // Kroger is optional
+    krogerStores(here, Math.min(miles, 25)).catch(() => []), // Kroger is optional
   ]);
   fail(own.error, 'Nearby stores');
   const byId = new Map(own.data.map((s) => [s.id, s]));

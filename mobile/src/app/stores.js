@@ -9,7 +9,7 @@ import { ChainDot } from '../components/bits';
 
 export default function Stores() {
   const t = useTheme();
-  const { stores, here, status } = useAppData();
+  const { stores, here, status, radius } = useAppData();
 
   const groups = new Map();
   for (const s of stores) {
@@ -34,7 +34,7 @@ export default function Stores() {
     <SafeAreaView style={[styles.screen, { backgroundColor: t.bg }]} edges={['top']}>
       <Header />
       <ScrollView contentContainerStyle={styles.content}>
-        {sorted.length === 0 && <Text style={[styles.meta, { color: t.muted }]}>No stores we know of within 15 miles.</Text>}
+        {sorted.length === 0 && <Text style={[styles.meta, { color: t.muted }]}>No stores we know of within {radius} miles.</Text>}
         {sorted.map((list) => {
           const s0 = list[0].s;
           const err = AD_CHAINS.includes(s0.chain) ? status[s0.chain]?.last_error : null;

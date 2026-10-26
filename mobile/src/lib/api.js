@@ -22,7 +22,7 @@ async function callKroger(params) {
 export async function nearbyStores(here, miles = 15) {
   const [own, kroger] = await Promise.all([
     supabase.rpc('stores_near', { p_lat: here.lat, p_lng: here.lng, p_miles: miles }),
-    callKroger({ action: 'locations', lat: here.lat.toFixed(3), lng: here.lng.toFixed(3), miles: Math.min(miles, 15) })
+    callKroger({ action: 'locations', lat: here.lat.toFixed(3), lng: here.lng.toFixed(3), miles: Math.min(miles, 25) })
       .then((r) => r.stores || []).catch(() => []), // Kroger is optional
   ]);
   fail(own.error, 'Nearby stores');

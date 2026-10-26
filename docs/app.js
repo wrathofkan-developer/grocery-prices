@@ -6,7 +6,7 @@ import {
 import * as api from './backend.js';
 
 const DEFAULT_HERE = { lat: 37.6547, lng: -122.4508, label: 'Near South SF' };
-const RADIUS_MILES = 15;
+const DEFAULT_RADIUS = 15; // miles; the location popup's slider changes it (1–25)
 const AD_CHAINS = ['safeway', 'traderjoes', 'sprouts', 'costco'];
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -20,6 +20,8 @@ const store = {
 const state = {
   list: store.get('gp.list', []),
   here: store.get('gp.here', DEFAULT_HERE),
+  radius: store.get('gp.radius', DEFAULT_RADIUS),
+  hideChains: new Set(store.get('gp.hideChains', [])), // stores turned off on My list
   open: null,
   tab: 'list',
   dealChain: 'all',
@@ -67,13 +69,15 @@ async function loadStatus() {
 /** The original way: our stores and this week's data files. */
 async function loadStatic() {
   const { stores } = await getJson('data/stores.json');
-  setStores(stores);
+  setStores(stores.filter((s) => miles(state.here, s) <= state.radius));
   const results = await Promise.allSettled(AD_CHAINS.map((c) => getJson(`data/${c}.json`)));
   data.adItems = [];
   AD_CHAINS.forEach((c, i) => {
     if (results[i].status !== 'fulfilled') return;
     data.chains[c] = results[i].value;
-    for (const it of results[i].value.items) data.adItems.push(indexItem(it, data.storesById));
+    for (const it of results[i].value.items) {
+      if ((it.stores || []).some((id) => data.storesById[id])) data.adItems.push(indexItem(it, data.storesById));
+    }
   });
   data.userItems = [];
   rebuildItems();
@@ -81,7 +85,7 @@ async function loadStatic() {
 
 /** From the shared database: stores near you (any ZIP), their ads, friends' prices. */
 async function loadServer() {
-  setStores(await api.nearbyStores(state.here, RADIUS_MILES));
+  setStores(await api.nearbyStores(state.here, state.radius));
   const ads = await api.adItems(data.stores.map((s) => s.id));
   data.adItems = ads.map((it) => indexItem(it, data.storesById));
   data.krogerByTerm.clear();
@@ -192,9 +196,35 @@ function seenText(item) {
 }
 
 // ---------- list view ----------
+// Stores you can turn off on My list (by chain, named by the sign: "Foods Co").
+function renderListFilter() {
+  const present = Object.keys(CHAINS).filter((k) => data.stores.some((s) => s.chain === k));
+  const name = (k) => [...new Set(data.stores.filter((s) => s.chain === k).map((s) => chainName(k, s.banner)))].join(' / ');
+  const box = $('#listFilter');
+  box.hidden = present.length < 2 || state.list.length === 0;
+  const allOn = present.every((k) => !state.hideChains.has(k));
+  box.innerHTML = `<button type="button" class="chip" data-listchain="all" aria-pressed="${allOn}">All stores</button>`
+    + present.map((k) => `<button type="button" class="chip" data-listchain="${k}" aria-pressed="${!allOn && !state.hideChains.has(k)}">${dot(k)}${esc(name(k))}</button>`).join('');
+}
+
+function toggleListChain(k) {
+  const present = Object.keys(CHAINS).filter((c) => data.stores.some((s) => s.chain === c));
+  const allOn = present.every((c) => !state.hideChains.has(c));
+  if (k === 'all') state.hideChains = new Set();
+  // From "All stores", tapping a store shows only that store; after that, taps add or remove stores.
+  else if (allOn) state.hideChains = new Set(present.filter((c) => c !== k));
+  else if (state.hideChains.has(k)) state.hideChains.delete(k);
+  else state.hideChains.add(k);
+  if (present.every((c) => state.hideChains.has(c))) state.hideChains = new Set(); // none left: back to all
+  store.set('gp.hideChains', [...state.hideChains]);
+  renderList();
+}
+
 function renderList() {
   ensureKroger();
-  const analyses = state.list.map((e) => analyzeEntry(data.items, e));
+  renderListFilter();
+  const shown = state.hideChains.size ? data.items.filter((it) => !state.hideChains.has(it.chain)) : data.items;
+  const analyses = state.list.map((e) => analyzeEntry(shown, e));
   $('#listEmpty').hidden = state.list.length > 0;
   $('#list').innerHTML = state.list.map((e, i) => rowHtml(e, analyses[i], i)).join('');
   renderTotal(analyses);
@@ -376,7 +406,7 @@ function renderStores() {
       </div>`).join('');
       return `<div class="store-group"><h2>${dot(s0.chain)}${esc(chainName(s0.chain, s0.banner))}</h2>${fresh}${stores}</div>`;
     });
-  $('#stores').innerHTML = parts.join('') || `<div class="empty"><p>No stores we know of within ${RADIUS_MILES} miles. ${api.enabled ? 'Sign in and add a price to add a store.' : ''}</p></div>`;
+  $('#stores').innerHTML = parts.join('') || `<div class="empty"><p>No stores we know of within ${state.radius} miles. ${api.enabled ? 'Sign in and add a price to add a store.' : ''}</p></div>`;
 }
 
 // ---------- rendering ----------
@@ -486,6 +516,7 @@ document.addEventListener('click', async (ev) => {
   if (!b) return;
   if (b.matches('[data-close]')) return b.closest('dialog')?.close();
   if (b.dataset.tab) return switchTab(b.dataset.tab);
+  if (b.dataset.listchain) return toggleListChain(b.dataset.listchain);
   if (b.dataset.chain) { state.dealChain = b.dataset.chain; state.dealLimit = 60; return renderDeals(); }
   const act = b.dataset.act;
   if (act === 'photo') return openPhoto(b.dataset.path);
@@ -560,9 +591,11 @@ async function zipToPoint(zip) {
 async function setHere(here) {
   state.here = here;
   store.set('gp.here', here);
-  $('#locLabel').textContent = here.label;
+  updateLocLabel();
   if (data.mode === 'server') {
     try { await loadServer(); } catch (e) { toast(`Couldn't load stores: ${e.message}`); }
+  } else {
+    await loadStatic();
   }
   render();
 }
@@ -570,6 +603,8 @@ async function setHere(here) {
 $('#locBtn').addEventListener('click', () => {
   $('#locError').hidden = true;
   $('#zipInput').value = state.here.zip || '';
+  $('#radiusInput').value = state.radius;
+  $('#radiusOut').textContent = `${state.radius} mi`;
   $('#locDialog').showModal();
 });
 
@@ -583,6 +618,22 @@ $('#locForm').addEventListener('submit', async (ev) => {
   $('#locDialog').close();
   await setHere({ ...pt, label: `Near ${zip}`, zip });
 });
+
+$('#radiusInput').addEventListener('input', (ev) => { $('#radiusOut').textContent = `${ev.target.value} mi`; });
+// Distance applies as soon as you let go of the slider, without changing your ZIP.
+$('#radiusInput').addEventListener('change', async (ev) => {
+  state.radius = Number(ev.target.value);
+  store.set('gp.radius', state.radius);
+  updateLocLabel();
+  if (data.mode === 'server') {
+    try { await loadServer(); } catch (e) { toast(`Couldn't load stores: ${e.message}`); }
+  } else {
+    await loadStatic();
+  }
+  render();
+});
+
+function updateLocLabel() { $('#locLabel').textContent = `${state.here.label} · ${state.radius} mi`; }
 
 function currentPosition(timeout = 10000) {
   return new Promise((resolve, reject) => {
@@ -772,7 +823,7 @@ $('#priceForm').addEventListener('submit', async (ev) => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
 
 (async function start() {
-  $('#locLabel').textContent = state.here.label;
+  updateLocLabel();
   try {
     await load();
   } catch (e) {

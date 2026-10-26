@@ -9,11 +9,12 @@ import Header from '../components/Header';
 import AddBar from '../components/AddBar';
 import ListRow from '../components/ListRow';
 import TotalBar from '../components/TotalBar';
+import ListFilter from '../components/ListFilter';
 
 export default function MyList() {
   const t = useTheme();
-  const { list, items, loading, error, reload } = useAppData();
-  const analyses = useMemo(() => list.map((e) => analyzeEntry(items, e)), [list, items]);
+  const { list, items, listItems, loading, error, reload } = useAppData();
+  const analyses = useMemo(() => list.map((e) => analyzeEntry(listItems, e)), [list, listItems]);
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: t.bg }]} edges={['top']}>
@@ -23,7 +24,7 @@ export default function MyList() {
         data={list}
         keyExtractor={(e) => e.id}
         renderItem={({ item, index }) => <ListRow entry={item} analysis={analyses[index]} />}
-        ListHeaderComponent={<AddBar />}
+        ListHeaderComponent={<><AddBar />{list.length > 0 && <ListFilter />}</>}
         ListEmptyComponent={
           <Text style={[styles.empty, { color: t.muted }]}>
             Your list is empty. Add what you need and you'll see the lowest price nearby and which store has it.

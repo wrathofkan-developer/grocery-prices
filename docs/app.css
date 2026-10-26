@@ -252,3 +252,9 @@ dialog.sheet::backdrop { background: rgba(10, 18, 14, .45); }
   background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 15px;
   box-shadow: 0 6px 20px rgba(0,0,0,.2); max-width: calc(100% - 32px);
 }
+
+/* My list store filter and the distance slider */
+.list-filter { margin: -4px 0 12px; }
+.range-row { display: flex; align-items: center; gap: 12px; }
+.field .range-row input[type="range"] { flex: 1; padding: 0; border: 0; background: none; accent-color: var(--green); min-height: 32px; }
+.range-row output { font-family: var(--num); font-size: 19px; min-width: 3.2em; text-align: right; color: var(--ink); }
