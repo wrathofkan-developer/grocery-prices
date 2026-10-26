@@ -68,7 +68,7 @@ const TAIL_NOISE = new Set(['gallon', 'half', 'oz', 'fl', 'lb', 'ct', 'count', '
  */
 function segments(name) {
   const out = [];
-  for (const seg of String(name).split(/[.,;]|\bor\b|\band\b/i)) {
+  for (const seg of String(name).split(/[.,;]|\bor\b/i)) {
     // The thing comes before "with"/"in": "Greek Yogurt Made with Whole Milk" is yogurt,
     // "Tuna in Olive Oil" is tuna.
     const core = seg.split(/\s(?:made with|with|in|w\/)\s/i)[0]; // spaces: not "Bone-In"

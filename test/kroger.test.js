@@ -77,3 +77,14 @@ test('the app\'s parser copy matches src/normalize.js', async () => {
   const b = await readFile(new URL('../docs/normalize.js', import.meta.url), 'utf8');
   assert.equal(b, a, 'run: cp src/normalize.js docs/normalize.js');
 });
+
+test('"and" inside one product name is not two products ("Apple and Walnut Oatmeal" is oatmeal)', () => {
+  const ctx = { storeId: 'kroger-70400351', today: '2026-10-26' };
+  const items = [
+    product({ id: 'o', name: 'Kroger® Raisin Apple and Walnut High Fiber Instant Oatmeal', size: '8 ct', regular: 2.19, promo: 1.79 }),
+    product({ id: 'g', name: 'Gala Apples', size: '3 lb', regular: 4.99 }),
+  ].map((p) => indexItem(mapProduct(p, ctx)));
+  const a = analyzeEntry(items, { q: 'apples', qty: 1 }, '2026-10-26');
+  assert.deepEqual(a.active.map((i) => i.id), ['kroger-70400351-g']);
+  assert.equal(analyzeEntry(items, { q: 'oatmeal', qty: 1 }, '2026-10-26').chosen.id, 'kroger-70400351-o');
+});
