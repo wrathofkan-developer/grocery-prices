@@ -186,3 +186,69 @@ main { max-width: 640px; margin: 0 auto; padding: 16px; }
 
 .item-link { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
 .item-link:hover, .item-link:focus-visible { text-decoration-color: currentColor; }
+
+/* ---------- phase 1 + 2: accounts, ZIP, prices people add ---------- */
+:root { --kroger: #0E7A8A; --other: #7A817E; --user: #5B6A65; }
+@media (prefers-color-scheme: dark) { :root { --kroger: #3FB4C4; --other: #9AA3A0; } }
+
+.top-actions { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.top-row { flex-wrap: wrap; }
+.acct span { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.add-price {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  margin: -4px 0 14px; padding: 11px 14px; border: 1px dashed var(--green); border-radius: var(--radius-m);
+  background: transparent; color: var(--green); font-weight: 600;
+}
+
+/* Sheets (dialogs) slide up from the bottom on phones. */
+dialog.sheet {
+  border: 0; padding: 0; margin: auto auto 0; width: 100%; max-width: 640px; max-height: 92vh;
+  border-radius: 16px 16px 0 0; background: var(--surface); color: var(--ink);
+}
+dialog.sheet::backdrop { background: rgba(10, 18, 14, .45); }
+@media (min-width: 700px) { dialog.sheet { margin: auto; border-radius: 16px; } }
+.sheet-body { padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 14px; }
+.sheet-body h2 { font: 700 24px/1.1 var(--num); margin: 0; }
+.sheet-note, .form-note { margin: 0; font-size: 14px; color: var(--muted); }
+.form-error { margin: 0; font-size: 14px; color: var(--warn); }
+.sheet-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.sheet-actions button { padding: 11px 16px; border-radius: var(--radius-m); border: 1px solid var(--line); background: var(--surface); font-weight: 600; }
+.sheet-actions .primary { background: var(--green); color: var(--green-ink); border-color: var(--green); }
+.sheet-actions .plain { border-color: transparent; color: var(--muted); }
+.sheet-actions button:disabled { opacity: .6; }
+
+.field { display: grid; gap: 5px; font-size: 14px; font-weight: 500; }
+.field input, .field select {
+  width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: var(--radius-m);
+  background: var(--bg); font-size: 17px; font-weight: 400;
+}
+.opt-label { color: var(--muted); font-weight: 400; }
+.field-row { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+.money-input { display: flex; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--bg); padding-left: 12px; }
+.money-input input { border: 0; background: transparent; padding-left: 4px; }
+.checks { display: grid; gap: 8px; font-size: 15px; }
+.checks input { width: 18px; height: 18px; margin-right: 8px; vertical-align: -3px; accent-color: var(--green); }
+.new-store { border: 1px solid var(--line); border-radius: var(--radius-m); padding: 10px 12px 12px; display: grid; gap: 10px; }
+.new-store legend { padding: 0 4px; font-weight: 600; font-size: 14px; }
+
+.photo-pick {
+  position: relative; display: grid; place-items: center; min-height: 120px; padding: 14px;
+  border: 1px dashed var(--line); border-radius: var(--radius-m); background: var(--bg);
+  color: var(--muted); text-align: center; font-size: 15px; cursor: pointer; overflow: hidden;
+}
+.photo-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.photo-pick img { max-width: 100%; max-height: 220px; border-radius: 6px; }
+.photo-pick:focus-within { outline: 3px solid var(--green); outline-offset: 2px; }
+
+/* A price a friend saw: plain tag with a dashed edge. */
+.tag.user { border-style: dashed; border-color: var(--user); }
+.tag.user.sale { background: var(--tag); border-color: var(--tag-edge); }
+.seen { font-size: 13px; color: var(--muted); }
+.seen button { border: 0; background: none; padding: 0 0 0 6px; color: var(--green); font-size: 13px; font-weight: 500; }
+
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(170px + env(safe-area-inset-bottom)); z-index: 20;
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.2); max-width: calc(100% - 32px);
+}

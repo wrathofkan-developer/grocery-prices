@@ -1,20 +1,40 @@
 // Pure logic shared by the app and the tests. No DOM here.
+import { parseSize, unitPrice } from './normalize.js';
 
 export const CHAINS = {
   safeway: { name: 'Safeway' },
   traderjoes: { name: "Trader Joe's" },
   sprouts: { name: 'Sprouts' },
   costco: { name: 'Costco' },
+  kroger: { name: 'Kroger' },
+  other: { name: 'Other stores' },
 };
 
-const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' });
-export const todayPT = (now = new Date()) => ymd.format(now);
+/** Display name for a store's chain (Kroger stores show their banner, e.g. Ralphs). */
+export function chainName(chain, banner) {
+  if ((chain === 'kroger' || chain === 'other') && banner) return banner;
+  return CHAINS[chain]?.name || banner || chain;
+}
 
-/** Same rule as the fetchers: keyed on the ad's own start/end dates. */
+export const DEFAULT_TZ = 'America/Los_Angeles';
+const fmts = new Map();
+/** Today's date in a time zone, e.g. "2026-10-23". */
+export function todayIn(tz = DEFAULT_TZ, now = new Date()) {
+  if (!fmts.has(tz)) fmts.set(tz, new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }));
+  return fmts.get(tz).format(now);
+}
+export const todayPT = (now = new Date()) => todayIn(DEFAULT_TZ, now);
+
+/**
+ * Same rule as the fetchers: keyed on the ad's own start/end dates, as dates in
+ * the store's time zone. `today` may be a fixed date (tests) or omitted, in which
+ * case each item uses today in its own store's zone (item._tz).
+ */
 export function priceStatus(item, today) {
   if (!item.valid_from) return 'unknown';
-  if (today < item.valid_from) return 'upcoming';
-  if (item.valid_to && today > item.valid_to) return 'expired';
+  const t = typeof today === 'string' ? today : todayIn(item._tz || DEFAULT_TZ);
+  if (t < item.valid_from) return 'upcoming';
+  if (item.valid_to && t > item.valid_to) return 'expired';
   return 'active';
 }
 
@@ -65,12 +85,13 @@ function segments(name) {
 }
 
 /** Pre-compute search keys once per item. */
-export function indexItem(item) {
+export function indexItem(item, storesById) {
   const t = tokens(`${item.name} ${item.brand || ''}`);
   const segs = segments(item.name);
   const heads = new Set();
   for (const s of segs) { heads.add(s.head); if (s.head2) heads.add(s.head2); }
-  return { ...item, _tok: t, _joined: t.join(''), _segs: segs, _heads: heads };
+  const store = storesById && (item.stores || []).map((id) => storesById[id]).find(Boolean);
+  return { ...item, _tok: t, _joined: t.join(''), _segs: segs, _heads: heads, _tz: store?.tz || item._tz || DEFAULT_TZ };
 }
 
 // ---------- how "basic" a match is ----------
@@ -426,4 +447,46 @@ export function ago(iso, now = Date.now()) {
   const h = Math.round(m / 60);
   if (h < 36) return `${h} hr ago`;
   return `${Math.round(h / 24)} days ago`;
+}
+
+// ---------- prices people add ----------
+
+/** "2026-10-26" + n days, as a date string. */
+export function addDays(iso, n) {
+  const d = new Date(`${iso}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+// How long a price someone saw stays current: shelf prices 90 days, sale prices a week.
+export const USER_PRICE_DAYS = { regular: 90, sale: 7 };
+
+/** A row from user_prices -> an item record the matching and totals understand. */
+export function userPriceItem(row, { store, names = {}, me = null } = {}) {
+  const perLb = Boolean(row.per_lb);
+  const price = Number(row.price);
+  const size = perLb ? null : parseSize(row.size_text);
+  return {
+    id: `user-${row.id}`,
+    chain: store?.chain || 'other',
+    stores: [row.store_id],
+    kind: 'user',
+    is_sale: Boolean(row.is_sale),
+    name: String(row.item_name || '').trim(),
+    brand: null,
+    size_text: row.size_text || null,
+    price,
+    regular_price: null,
+    promo: null,
+    price_per: perLb ? 'lb' : 'each',
+    unit_price: unitPrice(price, size, perLb ? 'lb' : null),
+    deal_text: null,
+    valid_from: row.observed_on,
+    valid_to: addDays(row.observed_on, (row.is_sale ? USER_PRICE_DAYS.sale : USER_PRICE_DAYS.regular) - 1),
+    seen_on: row.observed_on,
+    seen_by: row.user_id === me ? 'you' : names[row.user_id] || 'a friend',
+    mine: Boolean(me && row.user_id === me),
+    photo_path: row.photo_path || null,
+    url: null,
+  };
 }

@@ -48,3 +48,7 @@ jobs:
           git commit -m "Update prices $(TZ=America/Los_Angeles date '+%Y-%m-%d %H:%M %Z')"
           for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 5; done
           exit 1
+      - name: Sync to database
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node src/sync-db.js ${{ github.event.inputs.chains || 'safeway traderjoes costco' }}

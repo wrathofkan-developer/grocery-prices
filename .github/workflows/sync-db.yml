@@ -1,0 +1,28 @@
+name: Sync prices to database
+
+# Copies price data into Supabase when it's pushed from outside GitHub Actions
+# (the Windows PC's Sprouts fetch). GitHub's own nightly fetch syncs in fetch.yml,
+# because pushes made by Actions don't start other workflows.
+on:
+  push:
+    branches: [main]
+    paths: ['docs/data/**']
+  workflow_dispatch:
+
+concurrency:
+  group: db-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Sync
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node src/sync-db.js

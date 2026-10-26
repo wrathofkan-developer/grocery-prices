@@ -1,6 +1,6 @@
 # Grocery Prices
 
-A phone-first web app for the South San Francisco / Daly City area. Add items to a list and it shows the lowest current price, which nearby store has it, and an estimated total. Data comes from each store's own website.
+A phone-first web app: add items to a list and it shows the lowest current price, which nearby store has it, and an estimated total. Ad and shelf prices come from store websites (South SF / Daly City), Kroger-family stores anywhere in the US come from Kroger's API, and signed-in friends share prices they see in stores (with a photo).
 
 | Store | What we get | Where it runs |
 |---|---|---|
@@ -9,9 +9,18 @@ A phone-first web app for the South San Francisco / Daly City area. Add items to
 | Costco (South SF #422) | Monthly member savings book | GitHub, just after midnight |
 | Sprouts (Daly City #276) | Weekly and monthly ads | Your Windows PC (needs a real browser) |
 
+## Shared database (Supabase)
+
+- `supabase/migrations/`: tables for stores (with time zones), ad items, friends' prices, receipt photos; row-level security (ads public, shared prices for signed-in users, you can only post/delete as yourself).
+- `supabase/functions/kroger/`: Kroger stores near a point and prices for a search term; the Kroger secret stays on the server; results cached.
+- `docs/config.js`: public project URL and publishable key. Empty = static mode (data files only).
+- Workflows: **Deploy database** applies migrations, sets Kroger secrets, deploys the function, loads store data. **Sync prices to database** copies fetched data after each push; the nightly fetch syncs too.
+- Repository secrets needed: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_SERVICE_ROLE_KEY`, `KROGER_CLIENT_ID`, `KROGER_CLIENT_SECRET`.
+- ZIP lookup uses `docs/data/zip/` (US Census ZCTA centers, split by first 3 digits).
+
 ## Effective dates
 
-Every price carries the ad's own `valid_from` / `valid_to`, as Pacific calendar dates. The app decides what's live from those dates each time it opens:
+Every price carries the ad's own `valid_from` / `valid_to`, as calendar dates in the store's own time zone (`tz` on each store). The app decides what's live from those dates each time it opens:
 
 - **Safeway** posts its ad a day early (`available_from` Tue, `valid_from` Wed). The posted date is recorded but never used for pricing.
 - Flipp's timestamps are midnight *Eastern*. Converting them would start ads at 9pm Pacific the night before, so the plain date field is used instead.
@@ -35,7 +44,7 @@ windows/        Task Scheduler setup for the PC fetcher
 ## Commands
 
 ```
-npm test                 # parsers + date logic + matching
+npm test                 # parsers, date logic, matching, database rules (PGlite)
 npm run fetch:cloud      # safeway traderjoes costco
 npm run fetch:sprouts    # needs Playwright (Windows setup installs it)
 ```

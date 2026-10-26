@@ -20,5 +20,8 @@
   "private": true,
   "optionalDependencies": {
     "playwright": "^1.48.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.17"
   }
 }

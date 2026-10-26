@@ -131,3 +131,38 @@ test('eggs show price per dozen', async () => {
   const avo = indexItem({ ...mk({ id: 'a', chain: 'traderjoes', name: 'Avocados 4 count', price: 3.99 }), unit_price: { value: 3.99 / 4, unit: 'ct' } });
   assert.equal(unitLabel(avo.unit_price, avo), '$1.00/ea');
 });
+
+test('ads switch at each store\'s local midnight', async () => {
+  const { todayIn } = await import('../docs/logic.js');
+  // 11:30pm Tuesday in California = 2:30am Wednesday in New York.
+  const now = new Date('2026-10-28T06:30:00Z');
+  assert.equal(todayIn('America/Los_Angeles', now), '2026-10-27');
+  assert.equal(todayIn('America/New_York', now), '2026-10-28');
+  const ad = { valid_from: '2026-10-28', valid_to: '2026-11-03' };
+  const ny = indexItem({ ...mk({ id: 'n', chain: 'kroger', name: 'Eggs', price: 3 }), ...ad, stores: ['k-ny'] }, { 'k-ny': { tz: 'America/New_York' } });
+  const ca = indexItem({ ...mk({ id: 'c', chain: 'safeway', name: 'Eggs', price: 3 }), ...ad, stores: ['s-ca'] }, { 's-ca': { tz: 'America/Los_Angeles' } });
+  assert.equal(ny._tz, 'America/New_York');
+  const { priceStatus } = await import('../docs/logic.js');
+  // Same instant: New York's ad is live, California's hasn't started.
+  assert.equal(priceStatus(ny, todayIn(ny._tz, now)), 'active');
+  assert.equal(priceStatus(ca, todayIn(ca._tz, now)), 'upcoming');
+});
+
+test('prices people add: match like any other price, then expire', async () => {
+  const { userPriceItem } = await import('../docs/logic.js');
+  const store = { id: 'sprouts-276', chain: 'sprouts', tz: 'America/Los_Angeles' };
+  const row = (o) => ({ id: o.id, user_id: o.user || 'u1', store_id: 'sprouts-276', item_name: o.name, price: o.price, per_lb: false, size_text: o.size || null, is_sale: o.sale || false, observed_on: o.on || '2026-10-26', photo_path: 'u1/a.jpg' });
+  const shelf = indexItem(userPriceItem(row({ id: 1, name: 'Large Brown Eggs', price: 5.49, size: '1 dozen' }), { store, names: { u1: 'Mikey' }, me: 'u2' }), { 'sprouts-276': store });
+  assert.equal(shelf.seen_by, 'Mikey');
+  const a = analyzeEntry([shelf], { q: 'eggs', qty: 1 }, '2026-10-27');
+  assert.equal(a.chosen.id, 'user-1');
+  assert.equal(unitLabel(shelf.unit_price, shelf), '$5.49/doz');
+  // Shelf prices stay current 90 days; sale prices 7.
+  assert.equal(shelf.valid_to, '2027-01-23', 'seen Oct 26 -> current through Jan 23 (90 days)');
+  assert.equal(analyzeEntry([shelf], { q: 'eggs', qty: 1 }, '2027-01-23').chosen?.id, 'user-1');
+  assert.equal(analyzeEntry([shelf], { q: 'eggs', qty: 1 }, '2027-01-24').chosen, null);
+  const sale = indexItem(userPriceItem(row({ id: 2, name: 'Avocados', price: 1, sale: true }), { store, me: 'u1' }), {});
+  assert.equal(sale.mine, true);
+  assert.equal(sale.seen_by, 'you');
+  assert.equal(sale.valid_to, '2026-11-01');
+});

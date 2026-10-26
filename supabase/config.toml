@@ -1,0 +1,7 @@
+# Supabase CLI settings used by the deploy workflow.
+project_id = "grocery-prices"
+
+[functions.kroger]
+# The app calls this with the public key; newer "publishable" keys aren't JWTs,
+# so JWT verification is off. The function only reads public Kroger data.
+verify_jwt = false

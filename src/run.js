@@ -7,7 +7,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { todayPT, priceStatus } from './dates.js';
+import { todayIn, TZ, priceStatus } from './dates.js';
 import { redact } from './http.js';
 import { fetchSafeway } from './fetchers/safeway.js';
 import { fetchTraderJoes } from './fetchers/traderjoes.js';
@@ -27,10 +27,10 @@ export async function runChain(chain, allStores, runner = process.env.FETCH_RUNN
   const started = new Date().toISOString();
   try {
     const { ads, items } = await FETCHERS[chain](stores);
-    const today = todayPT();
+    const today = todayIn(stores[0]?.tz || TZ);
     // Drop anything already over; keep active and upcoming.
     const kept = items.filter((i) => priceStatus(i, today) !== 'expired');
-    const out = { chain, fetched_at: started, fetched_on_pt: today, runner, ads, items: kept };
+    const out = { chain, fetched_at: started, fetched_on: today, runner, ads, items: kept };
     await writeFile(path.join(DATA, `${chain}.json`), JSON.stringify(out) + '\n');
     const counts = {
       active: kept.filter((i) => priceStatus(i, today) === 'active').length,

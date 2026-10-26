@@ -4,7 +4,7 @@
 // valid_from = the day we saw the price, and no end date.
 
 import { request, sleep } from '../http.js';
-import { todayPT } from '../dates.js';
+import { todayIn, TZ } from '../dates.js';
 import { parseSize, toBase, canonicalUnit, unitPrice, cleanText, round2 } from '../normalize.js';
 
 const API = 'https://www.traderjoes.com/api/graphql';
@@ -56,7 +56,7 @@ export function mapItem(p, storeIds, today, category) {
 }
 
 export async function fetchTraderJoes(stores) {
-  const today = todayPT();
+  const today = todayIn(stores[0]?.tz || TZ);
   // sku -> price -> Set(storeIds). Same price at several stores collapses to one record.
   const bySku = new Map();
   const raw = new Map();

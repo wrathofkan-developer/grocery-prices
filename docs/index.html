@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Grocery Prices</title>
-<meta name="description" content="Weekly ads and shelf prices for Safeway, Trader Joe's, Sprouts and Costco around South San Francisco and Daly City.">
+<meta name="description" content="Weekly ads, shelf prices, and prices friends share, for grocery stores near you.">
 <meta name="theme-color" content="#F3F6F4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111715" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,10 +22,16 @@
 <header class="top">
   <div class="top-row">
     <h1>Grocery prices</h1>
-    <button id="locBtn" class="loc" type="button" aria-label="Use my location for store distances">
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-      <span id="locLabel">Near South SF</span>
-    </button>
+    <div class="top-actions">
+      <button id="locBtn" class="loc" type="button" aria-haspopup="dialog" aria-controls="locDialog">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+        <span id="locLabel">Near South SF</span>
+      </button>
+      <button id="acctBtn" class="loc acct" type="button" aria-haspopup="dialog" aria-controls="acctDialog" hidden>
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5Z"/></svg>
+        <span id="acctLabel">Sign in</span>
+      </button>
+    </div>
   </div>
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button role="tab" id="tab-list" aria-controls="view-list" aria-selected="true" data-tab="list">My list</button>
@@ -45,6 +51,10 @@
       </div>
       <button type="submit">Add</button>
     </form>
+    <button id="addPriceBtn" class="add-price" type="button" hidden>
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9Zm3 5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z"/></svg>
+      Add a price you saw
+    </button>
     <ol id="list" class="list"></ol>
     <div id="listEmpty" class="empty" hidden>
       <p>Your list is empty. Add what you need and you'll see the lowest price nearby and which store has it.</p>
@@ -76,6 +86,98 @@
 </footer>
 
 <div id="loadError" class="load-error" role="alert" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<dialog id="locDialog" class="sheet" aria-labelledby="locTitle">
+  <form method="dialog" class="sheet-body" id="locForm">
+    <h2 id="locTitle">Where are you shopping?</h2>
+    <label class="field">ZIP code
+      <input id="zipInput" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="94080">
+    </label>
+    <p id="locError" class="form-error" hidden></p>
+    <div class="sheet-actions">
+      <button type="submit" class="primary" value="zip">Use this ZIP</button>
+      <button type="button" id="gpsBtn">Use my location</button>
+      <button type="button" class="plain" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="acctDialog" class="sheet" aria-labelledby="acctTitle">
+  <div class="sheet-body">
+    <h2 id="acctTitle">Share prices with friends</h2>
+    <form id="signInForm">
+      <p class="sheet-note">Signed-in friends see each other's prices and photos. We'll email you a link; tap it to sign in. No password.</p>
+      <label class="field">Email
+        <input id="emailInput" type="email" autocomplete="email" required placeholder="you@example.com">
+      </label>
+      <p id="signInMsg" class="form-note" hidden></p>
+      <div class="sheet-actions">
+        <button type="submit" class="primary">Email me a sign-in link</button>
+        <button type="button" class="plain" data-close>Cancel</button>
+      </div>
+    </form>
+    <form id="profileForm" hidden>
+      <p class="sheet-note" id="signedInAs"></p>
+      <label class="field">Your name (friends see it next to prices you add)
+        <input id="nameInput" maxlength="40" autocomplete="nickname" required placeholder="Mikey">
+      </label>
+      <div class="sheet-actions">
+        <button type="submit" class="primary">Save name</button>
+        <button type="button" id="signOutBtn">Sign out</button>
+        <button type="button" class="plain" data-close>Close</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="priceDialog" class="sheet" aria-labelledby="priceTitle">
+  <form id="priceForm" class="sheet-body" autocomplete="off">
+    <h2 id="priceTitle">Add a price you saw</h2>
+    <label class="photo-pick">
+      <input id="photoInput" type="file" accept="image/*" capture="environment">
+      <span id="photoPrompt">Take a picture of the price tag or receipt</span>
+      <img id="photoPreview" alt="" hidden>
+    </label>
+    <label class="field">Item
+      <input id="itemInput" required maxlength="120" placeholder="Large brown eggs" list="itemList">
+      <datalist id="itemList"></datalist>
+    </label>
+    <div class="field-row">
+      <label class="field">Price
+        <span class="money-input"><span aria-hidden="true">$</span><input id="priceInput" required inputmode="decimal" placeholder="5.99"></span>
+      </label>
+      <label class="field">Size <span class="opt-label">(optional)</span>
+        <input id="sizeInput" maxlength="40" placeholder="1 dozen, 64 fl oz">
+      </label>
+    </div>
+    <div class="checks">
+      <label><input id="perLbInput" type="checkbox"> Price is per pound</label>
+      <label><input id="saleInput" type="checkbox"> This was a sale price</label>
+    </div>
+    <label class="field">Store
+      <select id="storeSelect" required></select>
+    </label>
+    <fieldset id="newStore" class="new-store" hidden>
+      <legend>New store</legend>
+      <label class="field">Store name
+        <input id="newStoreName" maxlength="80" placeholder="Grocery Outlet Daly City">
+      </label>
+      <label class="field">Address <span class="opt-label">(optional)</span>
+        <input id="newStoreAddr" maxlength="120" placeholder="2 Southgate Ave, Daly City">
+      </label>
+      <p class="form-note" id="newStoreWhere">Location: where you are now (we'll ask your phone), or your ZIP's center.</p>
+    </fieldset>
+    <label class="field">Date seen
+      <input id="dateInput" type="date" required>
+    </label>
+    <p id="priceError" class="form-error" hidden></p>
+    <div class="sheet-actions">
+      <button type="submit" class="primary" id="savePriceBtn">Save price</button>
+      <button type="button" class="plain" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
 
 <script type="module" src="app.js"></script>
 </body>

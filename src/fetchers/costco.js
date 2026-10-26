@@ -63,7 +63,9 @@ export function parseTiles(html, { validity, storeIds }) {
       deal = append || null;
     }
     const size = parseSize(sizeText);
-    const sku = itemNo ? itemNo.replace(/^Item\s*/, '').split(/,\s*/)[0] : name.toLowerCase().replace(/\W+/g, '-');
+    // "Item 755383" -> 755383. Some tiles say "Item numbers vary."; use the name then.
+    const num = (itemNo || '').match(/^Item\s+(\d+)/);
+    const sku = num ? num[1] : name.toLowerCase().replace(/\W+/g, '-').replace(/^-|-$/g, '');
 
     items.push({
       id: `costco-${sku}`,

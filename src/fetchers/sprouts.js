@@ -17,30 +17,30 @@
 //     deal applies when buying 2. price = per-unit price with the deal,
 //     regular_price = one unit without it, promo = the deal for exact totals.
 
-import { instantToPTDate } from '../dates.js';
+import { instantToDate, TZ } from '../dates.js';
 import { parsePrice, parseSize, unitPrice, cleanText, parseMultiBuy, multiBuyCost, round2 } from '../normalize.js';
 
 const BASE = 'https://shop.sprouts.com/store/sprouts/flyers/view';
 const PRODUCT = 'https://shop.sprouts.com/store/sprouts/products';
 const AD_TAGS = ['weekly', 'monthly'];
 
-function flyerWindow(flyersJson, tag) {
+function flyerWindow(flyersJson, tag, tz = TZ) {
   const flyer = (flyersJson?.data?.flyers || []).find((f) => f.tag === tag) || flyersJson?.data?.flyers?.[0];
   if (!flyer) throw new Error(`Sprouts: no ${tag} flyer in response`);
   const loc = flyer.flyerRetailerLocation || {};
   return {
     flyer,
     loc,
-    valid_from: instantToPTDate(loc.startsAt),
+    valid_from: instantToDate(loc.startsAt, tz),
     // endsAt is 06:59:59Z = 11:59:59pm Pacific the previous calendar day.
-    valid_to: instantToPTDate(loc.endsAt),
+    valid_to: instantToDate(loc.endsAt, tz),
     adName: flyer.name || `${tag[0].toUpperCase()}${tag.slice(1)} Ad`,
   };
 }
 
 /** Pure parser: Flyers + FlyerActivities JSON -> one record per ad tile. Unit-tested. */
-export function parseSproutsFlyer(flyersJson, activitiesJson, { tag, storeIds }) {
-  const { flyer, loc, valid_from, valid_to, adName } = flyerWindow(flyersJson, tag);
+export function parseSproutsFlyer(flyersJson, activitiesJson, { tag, storeIds, tz = TZ }) {
+  const { flyer, loc, valid_from, valid_to, adName } = flyerWindow(flyersJson, tag, tz);
   const acts = activitiesJson?.data?.flyerActivities || [];
   const items = [];
   for (const a of acts) {
@@ -194,7 +194,7 @@ export async function fetchSprouts(stores) {
         console.warn(`Sprouts: ${tag} ad data not captured`);
         continue;
       }
-      const res = parseSproutsFlyer(captured.Flyers, captured.FlyerActivities, { tag, storeIds });
+      const res = parseSproutsFlyer(captured.Flyers, captured.FlyerActivities, { tag, storeIds, tz: stores[0]?.tz || TZ });
       res.ad.storeShown = storeNo || null;
 
       // Open one tile to learn the product-panel request, then load every tile's products.

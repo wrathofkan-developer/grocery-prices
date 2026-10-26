@@ -150,3 +150,11 @@ test('Sprouts: flyer window and items', () => {
   const monthly = parseSproutsFlyer(flyers, acts, { tag: 'monthly', storeIds: [] });
   assert.equal(monthly.ad.valid_from, '2026-09-23');
 });
+
+test('Costco: "Item numbers vary" tiles get distinct ids', () => {
+  const tile = (name) => `<div data-testid="Grid"><a data-testid="Link" href="x"><span>${name}</span></a><div><div data-testid="Text">Warehouse Only</div><div data-testid="Text">Item numbers vary.</div><div data-testid="Text_prices_and_percentages_prepend_text">Save</div><p data-testid="Text_prices_and_percentages_prices"><span data-testid="Text">$80</span></p></div></div>`;
+  const html = `<p>Valid 10/19/26 - 11/15/26</p>${tile('ON ANY SET OF 4 Bridgestone Tires')}${tile('BUY ONE PAIR of prescription eyeglasses')}`;
+  const items = parseTiles(html, { validity: parseValidity(html), storeIds: [] });
+  assert.equal(new Set(items.map((i) => i.id)).size, 2);
+  assert.equal(items[0].id, 'costco-on-any-set-of-4-bridgestone-tires');
+});
