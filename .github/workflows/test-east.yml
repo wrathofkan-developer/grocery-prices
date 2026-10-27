@@ -1,0 +1,12 @@
+name: test-east (temporary)
+on:
+  push:
+    branches: [test-east-zip]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scratch-test/east.mjs 10001 02108 30303 23219 28202 45202 20001
