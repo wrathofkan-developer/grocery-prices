@@ -1,5 +1,5 @@
 
-===== 10001 {"lat":40.7506,"lng":-73.9973}
+===== 02108 {"lat":42.3551,"lng":-71.0657}
 own stores: 0; kroger status 200: 0 
 ad items: 0; total items: 0; kroger stores used: 
   eggs: no price
@@ -9,24 +9,38 @@ ad items: 0; total items: 0; kroger stores used:
   butter: no price
   bread: no price
 
-===== 20001 {"lat":38.9104,"lng":-77.0177}
-own stores: 0; kroger status 200: 15 
-  kroger/Harris Teeter Harris Teeter - Constitution Square | 1201 1st St NE, Washington, DC 20002 | tz America/New_York | 0.7 mi
-  kroger/Harris Teeter Harris Teeter - Adams Morgan | 1631 Kalorama Rd NW, Washington, DC 20009 | tz America/New_York | 1.4 mi
-  kroger/Harris Teeter Harris Teeter - The Yards | 401 M St SE, Washington, DC 20003 | tz America/New_York | 2.6 mi
-  kroger/Harris Teeter Harris Teeter - Pentagon Row | 900 Army Navy Dr, Arlington, VA 22202 | tz America/New_York | 3.9 mi
-  kroger/Harris Teeter Harris Teeter - Ballston | 624B N Glebe Rd, Arlington, VA 22203 | tz America/New_York | 5.5 mi
-  kroger/Harris Teeter Harris Teeter - Shirlington | 4250 Campbell Ave, Arlington, VA 22206 | tz America/New_York | 6.2 mi
-ad items: 0; total items: 450; kroger stores used: kroger-09700352,kroger-09700231,kroger-09700383
-  eggs: $1.99 regular | Highland Crest Large White Eggs 12 ct | Harris Teeter Harris Teeter - Constitution Square | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/highland-crest-large-white-eggs/0007203672973
-  milk: $2.19 regular | Harris Teeter™ 2% Reduced Fat Milk 1/2 gal | Harris Teeter Harris Teeter - Constitution Square | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-2-reduced-fat-milk/0007203673813
-  bananas: $0.59/lb regular | Fresh Bunch of Bananas – 5-7 Bananas 1 lb | Harris Teeter Harris Teeter - Constitution Square | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/fresh-bunch-of-bananas-5-7-bananas/0000000004011
-  chicken breast: $2.59/lb sale (reg 3.99) | Harris Teeter Boneless Chicken Breast Value Pack 1 lb | Harris Teeter Harris Teeter - Constitution Square | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-boneless-chicken-breast-value-pack/0020895500000
-  butter: $3.29 regular | Highland Crest Salted Butter 16 oz | Harris Teeter Harris Teeter - Constitution Square | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/highland-crest-salted-butter/0007203674617
-  bread: $2.00 sale (reg 2.39) | Harris Teeter™ Roundtop Sliced Bread 20 oz | Harris Teeter Harris Teeter - Constitution Square | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-roundtop-sliced-bread/0007203690011
+===== 07030 {"lat":40.7453,"lng":-74.0279}
+own stores: 0; kroger status 200: 0 
+ad items: 0; total items: 0; kroger stores used: 
+  eggs: no price
+  milk: no price
+  bananas: no price
+  chicken breast: no price
+  butter: no price
+  bread: no price
+
+===== 45202 {"lat":39.1067,"lng":-84.5042}
+own stores: 19; kroger status 200: 19 
+  kroger/Kroger Kroger - Kroger On the Rhine | 100 E Court St, Cincinnati, OH 45202 | tz America/New_York | 0.4 mi
+  kroger/Kroger Kroger - Newport | 20 W 6th St, Newport, KY 41071 | tz America/New_York | 1.3 mi
+  kroger/Kroger Kroger - Bellevue Kroger | 53 Donnermeyer Dr, Bellevue, KY 41073 | tz America/New_York | 1.3 mi
+  kroger/Kroger Kroger - University Plaza | 1 W Corry St, Cincinnati, OH 45219 | tz America/New_York | 1.5 mi
+  kroger/Kroger Kroger Marketplace - I-471 Memorial Pkwy Carothers Rd | 130 Pavilion Pkwy, Newport, KY 41071 | tz America/New_York | 1.8 mi
+  kroger/Kroger Kroger - 15th Madison | 1525 Madison Ave, Covington, KY 41011 | tz America/New_York | 2.3 mi
+ad items: 0; total items: 444; kroger stores used: kroger-01400513,kroger-01400473,kroger-01400359
+  eggs: $3.39 regular | Kroger® Medium Grade A White Eggs 30 ct | Kroger Kroger - Newport | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-medium-grade-a-white-eggs/0001111060980
+     milk option: $2.89 1 gal {"value":0.022578125,"unit":"fl_oz"} Kroger® 2% Reduced Fat Milk Gallon
+     milk option: $2.89 1 gal {"value":0.022578125,"unit":"fl_oz"} Kroger® Vitamin D Whole Milk Gallon
+     milk option: $2.89 1 gal {"value":0.022578125,"unit":"fl_oz"} Kroger® 1% Lowfat Milk Gallon
+     milk option: $2.89 1 gal {"value":0.022578125,"unit":"fl_oz"} Kroger® Skim Milk Gallon
+  milk: $2.89 regular | Kroger® 2% Reduced Fat Milk Gallon 1 gal | Kroger Kroger - Newport | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-2-reduced-fat-milk-gallon/0001111041700
+  bananas: $0.49/lb regular | Fresh Bunch of Bananas – 5-7 Bananas 1 lb | Kroger Kroger - Newport | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/fresh-bunch-of-bananas-5-7-bananas/0000000004011
+  chicken breast: $2.59/lb regular | Heritage Farm® Boneless Skinless Chicken Breasts 1 lb | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/heritage-farm-boneless-skinless-chicken-breasts/0028334900000
+  butter: $2.99 sale (reg 5.99) | Challenge® Salted Butter 16 oz | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/challenge-salted-butter/0004720015264
+  bread: $1.99 regular | Kroger® White Bread 20 oz | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-white-bread/0001111008485
 
 ===== 23219 {"lat":37.5406,"lng":-77.4347}
-own stores: 0; kroger status 200: 18 
+own stores: 18; kroger status 200: 18 
   kroger/Kroger Kroger - Lombardy | 901 N Lombardy St, Richmond, VA 23220 | tz America/New_York | 1.5 mi
   kroger/Kroger Kroger - Carytown | 3507 W Cary St, Richmond, VA 23221 | tz America/New_York | 3.1 mi
   kroger/Kroger Kroger - Willow Lawn | 1601 Willow Lawn Dr Ste 1, Richmond, VA 23230 | tz America/New_York | 4.5 mi
@@ -35,30 +49,18 @@ own stores: 0; kroger status 200: 18
   kroger/Kroger Kroger Marketplace - Kroger Marketplace | 6468 Mechanicsville Tpke, Mechanicsville, VA 23111 | tz America/New_York | 7.7 mi
 ad items: 0; total items: 447; kroger stores used: kroger-02900511,kroger-02900504,kroger-02900509
   eggs: $1.49 sale (reg 1.79) | Kroger® Grade A Large White Eggs 12 ct | Kroger Kroger - Lombardy | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-grade-a-large-white-eggs/0001111060903
-  milk: $1.59 regular | Kroger® 2% Reduced Fat Milk 16 fl. oz. Bottle 1 pt | Kroger Kroger - Lombardy | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-2-reduced-fat-milk-16-fl-oz-bottle/0001111050277
+     milk option: $3.08 1 gal {"value":0.0240625,"unit":"fl_oz"} Kroger® Skim Milk Gallon
+     milk option: $3.08 1 gal {"value":0.0240625,"unit":"fl_oz"} Kroger® Skim Milk Gallon
+     milk option: $3.08 1 gal {"value":0.0240625,"unit":"fl_oz"} Kroger® Skim Milk Gallon
+     milk option: $3.16 1 gal {"value":0.0246875,"unit":"fl_oz"} Kroger® 1% Lowfat Milk Gallon
+  milk: $3.08 regular | Kroger® Skim Milk Gallon 1 gal | Kroger Kroger - Lombardy | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-skim-milk-gallon/0001111042315
   bananas: $0.55/lb regular | Fresh Bunch of Bananas – 5-7 Bananas 1 lb | Kroger Kroger - Lombardy | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/fresh-bunch-of-bananas-5-7-bananas/0000000004011
   chicken breast: $2.59/lb regular | Heritage Farm® Boneless Skinless Chicken Breasts 1 lb | Kroger Kroger - Lombardy | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/heritage-farm-boneless-skinless-chicken-breasts/0028334900000
   butter: $2.99 sale (reg 5.49) | Challenge® Salted Butter 16 oz | Kroger Kroger - Lombardy | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/challenge-salted-butter/0004720015264
   bread: $1.99 regular | Kroger® White Bread 20 oz | Kroger Kroger - Lombardy | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-white-bread/0001111008485
 
-===== 28202 {"lat":35.2273,"lng":-80.8442}
-own stores: 0; kroger status 200: 25 
-  kroger/Harris Teeter Harris Teeter - Fifth and Poplar | 325 W 6th St, Charlotte, NC 28202 | tz America/New_York | 0.3 mi
-  kroger/Harris Teeter Harris Teeter - Kenilworth Commons | 1227 East Blvd, CHARLOTTE, NC 28203 | tz America/New_York | 1.6 mi
-  kroger/Harris Teeter Harris Teeter - Central Avenue | 1704 Central Ave, CHARLOTTE, NC 28205 | tz America/New_York | 2.0 mi
-  kroger/Harris Teeter Harris Teeter - Sedgefield | 2717 South Blvd, Charlotte, NC 28209 | tz America/New_York | 2.3 mi
-  kroger/Harris Teeter Harris Teeter - Myers Park Center | 1015 Providence Rd, CHARLOTTE, NC 28207 | tz America/New_York | 2.4 mi
-  kroger/Harris Teeter Harris Teeter - Park Road Shopping Center | 4101 Park Rd, Charlotte, NC 28209 | tz America/New_York | 3.6 mi
-ad items: 0; total items: 450; kroger stores used: kroger-09700205,kroger-09700061,kroger-09700401
-  eggs: $2.79 regular | Harris Teeter Large White Eggs 18 ct | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-large-white-eggs/0007203663217
-  milk: $1.79 regular | Harris Teeter™ 2% Reduced Fat Milk 1/2 gal | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-2-reduced-fat-milk/0007203673813
-  bananas: $0.69/lb regular | Fresh Bunch of Bananas – 5-7 Bananas 1 lb | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/fresh-bunch-of-bananas-5-7-bananas/0000000004011
-  chicken breast: $2.59/lb sale (reg 3.99) | Harris Teeter Boneless Chicken Breast Value Pack 1 lb | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-boneless-chicken-breast-value-pack/0020895500000
-  butter: $3.19 regular | Highland Crest Salted Butter 16 oz | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/highland-crest-salted-butter/0007203674617
-  bread: $2.00 sale (reg 2.39) | Harris Teeter™ Roundtop Sliced Bread 20 oz | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-roundtop-sliced-bread/0007203690011
-
 ===== 30303 {"lat":33.7528,"lng":-84.3902}
-own stores: 0; kroger status 200: 25 
+own stores: 24; kroger status 200: 24 
   kroger/Kroger Kroger - Glenwood Kroger | 800 Glenwood Ave SE, Atlanta, GA 30316 | tz America/New_York | 1.9 mi
   kroger/Kroger Kroger - Ponce | 725 Ponce de Leon Ave NE, Atlanta, GA 30306 | tz America/New_York | 2.0 mi
   kroger/Kroger Kroger - Edgewood | 1225 Caroline St NE, Atlanta, GA 30307 | tz America/New_York | 2.4 mi
@@ -67,34 +69,32 @@ own stores: 0; kroger status 200: 25
   kroger/Kroger Kroger - Ansley Mall | 1700 Monroe Dr NE, Atlanta, GA 30324 | tz America/New_York | 3.4 mi
 ad items: 0; total items: 447; kroger stores used: kroger-01100672,kroger-01100695,kroger-01100461
   eggs: $1.49 sale (reg 1.79) | Kroger® Grade A Large White Eggs 12 ct | Kroger Kroger - Glenwood Kroger | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-grade-a-large-white-eggs/0001111060903
-  milk: $1.69 regular | Kroger® 2% Reduced Fat Milk 16 fl. oz. Bottle 1 pt | Kroger Kroger - Glenwood Kroger | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-2-reduced-fat-milk-16-fl-oz-bottle/0001111050277
+     milk option: $2.79 1 gal {"value":0.021796875,"unit":"fl_oz"} Kroger® 2% Reduced Fat Milk Gallon
+     milk option: $2.79 1 gal {"value":0.021796875,"unit":"fl_oz"} Kroger® Vitamin D Whole Milk Gallon
+     milk option: $2.79 1 gal {"value":0.021796875,"unit":"fl_oz"} Kroger® 1% Lowfat Milk Gallon
+     milk option: $2.79 1 gal {"value":0.021796875,"unit":"fl_oz"} Kroger® Skim Milk Gallon
+  milk: $2.79 regular | Kroger® 2% Reduced Fat Milk Gallon 1 gal | Kroger Kroger - Glenwood Kroger | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-2-reduced-fat-milk-gallon/0001111041700
   bananas: $0.55/lb regular | Fresh Bunch of Bananas – 5-7 Bananas 1 lb | Kroger Kroger - Glenwood Kroger | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/fresh-bunch-of-bananas-5-7-bananas/0000000004011
   chicken breast: $2.59/lb regular | Heritage Farm® Boneless Skinless Chicken Breasts 1 lb | Kroger Kroger - Glenwood Kroger | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/heritage-farm-boneless-skinless-chicken-breasts/0028334900000
   butter: $2.99 sale (reg 6.29) | Challenge® Salted Butter 16 oz | Kroger Kroger - Glenwood Kroger | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/challenge-salted-butter/0004720015264
   bread: $1.99 regular | Kroger® White Bread 20 oz | Kroger Kroger - Glenwood Kroger | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-white-bread/0001111008485
 
-===== 45202 {"lat":39.1067,"lng":-84.5042}
-own stores: 0; kroger status 200: 25 
-  kroger/Kroger Kroger - Kroger On the Rhine | 100 E Court St, Cincinnati, OH 45202 | tz America/New_York | 0.4 mi
-  kroger/Harris Teeter Harris Teeter - - Unused Spoke | 1014 Vine St, Cincinnati, OH 45202 | tz America/New_York | 0.5 mi
-  kroger/Harris Teeter Harris Teeter - Spoke Forecast - HT Trans | 1014 Vine St, Cincinnati, OH 45202 | tz America/New_York | 0.5 mi
-  kroger/Harris Teeter Harris Teeter - Forecast Shed - HT Trans | 1014 Vine St, Cincinnati, OH 45202 | tz America/New_York | 0.5 mi
-  kroger/Kroger Kroger - Spoke Forecast | 1014 Vine St, Cincinnati, OH 45202 | tz America/New_York | 0.5 mi
-  kroger/Kroger Kroger - Forecast Shed | 1014 Vine St, Cincinnati, OH 45202 | tz America/New_York | 0.5 mi
-ad items: 0; total items: 148; kroger stores used: kroger-01400513,kroger-542FC807,kroger-542FC200
-  eggs: $1.49 sale (reg 1.89) | Kroger® Grade A Large White Eggs 12 ct | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-grade-a-large-white-eggs/0001111060903
-  milk: $1.79 regular | Kroger® 2% Reduced Fat Milk 16 fl. oz. Bottle 1 pt | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-2-reduced-fat-milk-16-fl-oz-bottle/0001111050277
-  bananas: $0.55/lb regular | Fresh Bunch of Bananas – 5-7 Bananas 1 lb | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/fresh-bunch-of-bananas-5-7-bananas/0000000004011
-  chicken breast: $2.59/lb regular | Heritage Farm® Boneless Skinless Chicken Breasts 1 lb | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/heritage-farm-boneless-skinless-chicken-breasts/0028334900000
-  butter: $2.99 sale (reg 5.99) | Challenge® Salted Butter 16 oz | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/challenge-salted-butter/0004720015264
-  bread: $1.99 regular | Kroger® White Bread 20 oz | Kroger Kroger - Kroger On the Rhine | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/kroger-white-bread/0001111008485
-
-===== 33131 {"lat":25.7655,"lng":-80.1843}
-own stores: 0; kroger status 200: 0 
-ad items: 0; total items: 0; kroger stores used: 
-  eggs: no price
-  milk: no price
-  bananas: no price
-  chicken breast: no price
-  butter: no price
-  bread: no price
+===== 28202 {"lat":35.2273,"lng":-80.8442}
+own stores: 25; kroger status 200: 25 
+  kroger/Harris Teeter Harris Teeter - Fifth and Poplar | 325 W 6th St, Charlotte, NC 28202 | tz America/New_York | 0.3 mi
+  kroger/Harris Teeter Harris Teeter - Kenilworth Commons | 1227 East Blvd, CHARLOTTE, NC 28203 | tz America/New_York | 1.6 mi
+  kroger/Harris Teeter Harris Teeter - Central Avenue | 1704 Central Ave, CHARLOTTE, NC 28205 | tz America/New_York | 2.0 mi
+  kroger/Harris Teeter Harris Teeter - Sedgefield | 2717 South Blvd, Charlotte, NC 28209 | tz America/New_York | 2.3 mi
+  kroger/Harris Teeter Harris Teeter - Myers Park Center | 1015 Providence Rd, CHARLOTTE, NC 28207 | tz America/New_York | 2.4 mi
+  kroger/Harris Teeter Harris Teeter - Park Road Shopping Center | 4101 Park Rd, Charlotte, NC 28209 | tz America/New_York | 3.6 mi
+ad items: 0; total items: 450; kroger stores used: kroger-09700205,kroger-09700061,kroger-09700401
+  eggs: $2.79 regular | Harris Teeter Large White Eggs 18 ct | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-large-white-eggs/0007203663217
+     milk option: $3.19 1 gal {"value":0.024921875,"unit":"fl_oz"} Harris Teeter 2% Reduced Fat Milk
+     milk option: $3.19 1 gal {"value":0.024921875,"unit":"fl_oz"} Harris Teeter™ Vitamin D Whole Milk Gallon
+     milk option: $3.19 1 gal {"value":0.024921875,"unit":"fl_oz"} Harris Teeter 1% Low Fat Milk
+     milk option: $3.19 1 gal {"value":0.024921875,"unit":"fl_oz"} Harris Teeter 2% Reduced Fat Milk
+  milk: $3.19 regular | Harris Teeter 2% Reduced Fat Milk 1 gal | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-2-reduced-fat-milk/0007203673805
+  bananas: $0.69/lb regular | Fresh Bunch of Bananas – 5-7 Bananas 1 lb | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/fresh-bunch-of-bananas-5-7-bananas/0000000004011
+  chicken breast: $2.59/lb sale (reg 3.99) | Harris Teeter Boneless Chicken Breast Value Pack 1 lb | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-boneless-chicken-breast-value-pack/0020895500000
+  butter: $3.19 regular | Highland Crest Salted Butter 16 oz | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/highland-crest-salted-butter/0007203674617
+  bread: $2.00 sale (reg 2.39) | Harris Teeter™ Roundtop Sliced Bread 20 oz | Harris Teeter Harris Teeter - Fifth and Poplar | valid 2026-10-26..null tz America/New_York status active | https://www.kroger.com/p/harris-teeter-roundtop-sliced-bread/0007203690011
