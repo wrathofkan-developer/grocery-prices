@@ -101,3 +101,21 @@ test('suggestions name the store you\'d shop at (Foods Co), not the parent compa
   const plain = suggest(items, 'apple', '2026-10-26', { labelOf })[0];
   assert.deepEqual(plain.stores, ['Foods Co']);
 });
+
+test('Kroger warehouses and delivery hubs are not stores', () => {
+  const fake = (locationId, name) => mapLocation({ ...location, locationId, name, chain: 'HART' });
+  assert.equal(fake('542FC807', 'Harris Teeter - Spoke Forecast - HT Trans'), null);
+  assert.equal(fake('542FC200', 'Kroger - Forecast Shed'), null);
+  assert.equal(fake('01400999', 'Harris Teeter - - Unused Spoke'), null);
+  assert.equal(fake('01400513', 'Kroger - Kroger On the Rhine').id, 'kroger-01400513');
+});
+
+test('Kroger milk: half gallon beats a pint on price per ounce', () => {
+  const ctx = { storeId: 'kroger-02900511', today: '2026-10-26' };
+  const pint = mapProduct(product({ id: '0001111050277', name: 'Kroger® 2% Reduced Fat Milk 16 fl. oz. Bottle', size: '1 pt', regular: 1.59 }), ctx);
+  const half = mapProduct(product({ id: '0001111041660', name: 'Kroger® 2% Reduced Fat Milk', size: '1/2 gal', regular: 1.99 }), ctx);
+  assert.equal(pint.unit_price.unit, 'fl_oz');
+  assert.ok(Math.abs(half.unit_price.value - 1.99 / 64) < 0.001, '1/2 gal is 64 fl oz');
+  const a = analyzeEntry([indexItem(pint), indexItem(half)], { id: 'm', q: 'milk', mode: 'generic', qty: 1, pin: null }, '2026-10-26');
+  assert.equal(a.chosen.size_text, '1/2 gal');
+});

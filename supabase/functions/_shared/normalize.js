@@ -39,19 +39,29 @@ export function toBase(qty, unit) {
 /**
  * Pull a package size out of free text.
  * Handles "64 fl oz", "64 - oz.", "3 lbs", "2/16 oz" (2 packs of 16 oz),
- * "18/12 fl oz", "120 ct", "6/32 oz".
+ * "18/12 fl oz", "120 ct", "6/32 oz", "1 pt", and fractions: "1/2 gal",
+ * "3/4 lb", "1 1/2 lb". N/M is a fraction for big units (gal, lb, qt, pt, kg, l)
+ * when M is 2, 3, 4 or 8 and N < M; otherwise it means N packs of M (Costco's
+ * "2/3 fl oz" is a 2-pack of 3 fl oz).
  * Returns { qty, unit } in base units, or null.
  */
+const FRACTION_UNITS = new Set(['gal', 'lb', 'qt', 'pt', 'kg', 'l']);
 export function parseSize(text) {
   if (!text) return null;
-  const s = String(text).replace(/ /g, ' ');
-  const re = /(?:(\d+)\s*\/\s*)?(\d+(?:\.\d+)?)\s*-?\s*(fl\.?\s*oz|fluid\s*ounces?|oz|ounces?|lbs?|pounds?|ct|count|pk|doz(?:en)?|gal(?:lons?)?|qt|quarts?|ml|kg|g|l|liters?)\.?\b/i;
+  const s = String(text).replace(/\u00a0/g, ' ');
+  const re = /(?:\b(\d+)\s+)?(?:(\d+)\s*\/\s*)?(\d+(?:\.\d+)?)\s*-?\s*(fl\.?\s*oz|fluid\s*ounces?|oz|ounces?|lbs?|pounds?|ct|count|pk|doz(?:en)?|gal(?:lons?)?|qt|quarts?|pt|pints?|ml|kg|g|l|liters?)\.?\b/i;
   const m = s.match(re);
   if (!m) return null;
-  const packs = m[1] ? Number(m[1]) : 1;
-  const unit = canonicalUnit(m[3]);
-  const base = toBase(packs * Number(m[2]), unit);
-  return base;
+  const unit = canonicalUnit(m[4]);
+  const whole = m[1] ? Number(m[1]) : 0;
+  const top = m[2] ? Number(m[2]) : null;
+  const bottom = Number(m[3]);
+  let qty;
+  if (top != null && FRACTION_UNITS.has(unit) && [2, 3, 4, 8].includes(bottom) && top < bottom) qty = whole + top / bottom; // 1/2 gal, 1 1/2 lb
+  else if (top != null) qty = top * bottom; // 6/32 oz = 6 packs of 32 oz
+  else if (whole) return toBase(bottom, unit); // "12 16 oz": not a mixed number; use the size
+  else qty = bottom;
+  return toBase(qty, unit);
 }
 
 /**
