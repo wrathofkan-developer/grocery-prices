@@ -158,3 +158,16 @@ test('Costco: "Item numbers vary" tiles get distinct ids', () => {
   assert.equal(new Set(items.map((i) => i.id)).size, 2);
   assert.equal(items[0].id, 'costco-on-any-set-of-4-bridgestone-tires');
 });
+
+test('sizes: fractions, pints, and packs', () => {
+  assert.deepEqual(parseSize('1/2 gal'), { qty: 64, unit: 'fl_oz' });
+  assert.deepEqual(parseSize('1/2 gallon'), { qty: 64, unit: 'fl_oz' });
+  assert.deepEqual(parseSize('3/4 lb'), { qty: 12, unit: 'oz' });
+  assert.deepEqual(parseSize('1 1/2 lb'), { qty: 24, unit: 'oz' });
+  assert.deepEqual(parseSize('1 pt'), { qty: 16, unit: 'fl_oz' });
+  assert.deepEqual(parseSize('1 Pint'), { qty: 16, unit: 'fl_oz' });
+  assert.deepEqual(parseSize('6/32 oz'), { qty: 192, unit: 'oz' }, '6 packs of 32 oz');
+  assert.deepEqual(parseSize('8/10 oz'), { qty: 80, unit: 'oz' }, '8 packs of 10 oz');
+  assert.deepEqual(parseSize('18/12 fl oz'), { qty: 216, unit: 'fl_oz' });
+  assert.deepEqual(parseSize('2/3 fl oz'), { qty: 6, unit: 'fl_oz' }, 'Costco 2-pack of 3 fl oz');
+});

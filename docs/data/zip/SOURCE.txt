@@ -1,1 +1,2 @@
 ZIP code locations: US Census Bureau ZIP Code Tabulation Areas (ZCTA), via the us-zips package (MIT License, Blake Knight), 2022 release. Split by first 3 digits.
+Includes ZIPs starting with 0 (New England, NJ, PR) since 2026-10-26.

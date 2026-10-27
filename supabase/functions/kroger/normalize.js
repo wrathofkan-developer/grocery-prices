@@ -18,8 +18,17 @@ export function bannerName(code) {
   return key ? key.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : 'Kroger';
 }
 
-/** One Kroger location -> a row for the stores table. */
+// Kroger's location list also has warehouses and delivery hubs. Seen in Cincinnati:
+// IDs like "542FC807" (FC = fulfillment center) named "Spoke Forecast", "Forecast Shed",
+// "Unused Spoke". Real stores have 8-digit numeric IDs.
+const NOT_A_STORE = /\b(spoke|forecast|shed|unused|fulfillment|warehouse|distribution|ocado|cfc)\b/i;
+export function isShoppableStore(l) {
+  return /^\d{8}$/.test(String(l?.locationId || '')) && !NOT_A_STORE.test(String(l?.name || ''));
+}
+
+/** One Kroger location -> a row for the stores table (null for warehouses and hubs). */
 export function mapLocation(l, tzLookup) {
+  if (!isShoppableStore(l)) return null;
   const a = l.address || {};
   const lat = Number(l.geolocation?.latitude);
   const lng = Number(l.geolocation?.longitude);
