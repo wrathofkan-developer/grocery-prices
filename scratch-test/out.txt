@@ -1,0 +1,27 @@
+
+===== 10001 {"lat":40.7506,"lng":-73.9973}
+own stores: 0; kroger status 200: 0 
+ad items: 0; total items: 0; kroger stores used: 
+  eggs: no price
+  milk: no price
+  bananas: no price
+  chicken breast: no price
+  butter: no price
+  bread: no price
+node:fs:560
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open '/home/runner/work/grocery-prices/grocery-prices/docs/data/zip/021.json'
+    at Object.openSync (node:fs:560:18)
+    at Object.readFileSync (node:fs:444:35)
+    at zipPt (file:///home/runner/work/grocery-prices/grocery-prices/scratch-test/east.mjs:6:48)
+    at file:///home/runner/work/grocery-prices/grocery-prices/scratch-test/east.mjs:11:16
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/runner/work/grocery-prices/grocery-prices/docs/data/zip/021.json'
+}
+
+Node.js v22.23.3
