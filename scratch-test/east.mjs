@@ -32,6 +32,7 @@ for (const zip of ZIPS) {
     const c = a.chosen;
     if (!c) { console.log(`  ${t}: no price`); continue; }
     const st = L.nearestStore(c, sById, here);
+    if (t==='milk') for (const x of a.active.slice(0,4)) console.log('     milk option:', L.money(x.price), x.size_text, JSON.stringify(x.unit_price), x.name);
     console.log(`  ${t}: ${L.money(c.price)}${c.price_per==='lb'?'/lb':''} ${c.kind}${c.regular_price?` (reg ${c.regular_price})`:''} | ${c.name} ${c.size_text||''} | ${L.chainName(c.chain, st?.store?.banner)} ${st?.store?.name} | valid ${c.valid_from}..${c.valid_to} tz ${c._tz} status ${L.priceStatus(c)} | ${c.url||''}`);
   }
 }
