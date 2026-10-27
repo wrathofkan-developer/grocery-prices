@@ -2,6 +2,9 @@ name: test-east (temporary)
 on:
   push:
     branches: [test-east-zip]
+    paths-ignore: ['scratch-test/out.txt']
+permissions:
+  contents: write
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -9,4 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: node scratch-test/east.mjs 10001 02108 30303 23219 28202 45202 20001
+      - run: node scratch-test/east.mjs 10001 02108 30303 23219 28202 45202 20001 > scratch-test/out.txt 2>&1 || true
+      - run: |
+          git config user.name test-bot; git config user.email test-bot@users.noreply.github.com
+          git add scratch-test/out.txt; git commit -m "temp: output"; git push
