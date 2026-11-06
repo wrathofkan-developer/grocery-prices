@@ -1,11 +1,11 @@
 {
   "chain": "safeway",
   "ok": true,
-  "at": "2026-11-05T08:59:38.231Z",
+  "at": "2026-11-06T08:19:27.294Z",
   "runner": "github",
   "items": 214,
-  "active": 196,
-  "upcoming": 18,
+  "active": 213,
+  "upcoming": 1,
   "priced": 185,
   "ads": [
     {
