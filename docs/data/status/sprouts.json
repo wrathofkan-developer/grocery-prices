@@ -1,12 +1,12 @@
 {
   "chain": "sprouts",
   "ok": true,
-  "at": "2026-11-07T05:47:38.197Z",
+  "at": "2026-11-09T16:51:45.156Z",
   "runner": "windows",
-  "items": 633,
-  "active": 633,
+  "items": 632,
+  "active": 632,
   "upcoming": 0,
-  "priced": 633,
+  "priced": 632,
   "ads": [
     {
       "id": "21534151963017824",
