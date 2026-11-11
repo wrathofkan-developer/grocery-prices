@@ -1,20 +1,13 @@
 {
   "chain": "safeway",
   "ok": true,
-  "at": "2026-11-10T08:56:14.742Z",
+  "at": "2026-11-11T08:20:33.304Z",
   "runner": "github",
-  "items": 413,
-  "active": 196,
-  "upcoming": 217,
-  "priced": 355,
+  "items": 228,
+  "active": 210,
+  "upcoming": 18,
+  "priced": 199,
   "ads": [
-    {
-      "id": "8210621",
-      "name": "Weekly Ad - Safeway - NorCal",
-      "valid_from": "2026-11-04",
-      "valid_to": "2026-11-10",
-      "posted": "2026-11-03"
-    },
     {
       "id": "8218453",
       "name": "Weekly Ad - Safeway - NorCal",
