@@ -1,12 +1,12 @@
 {
   "chain": "safeway",
   "ok": true,
-  "at": "2026-11-13T08:58:29.420Z",
+  "at": "2026-11-14T08:01:46.208Z",
   "runner": "github",
-  "items": 227,
-  "active": 226,
+  "items": 210,
+  "active": 209,
   "upcoming": 1,
-  "priced": 199,
+  "priced": 182,
   "ads": [
     {
       "id": "8218453",
