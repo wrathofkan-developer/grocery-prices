@@ -1,18 +1,18 @@
 {
   "chain": "costco",
   "ok": true,
-  "at": "2026-11-15T08:53:17.716Z",
+  "at": "2026-11-16T09:42:24.124Z",
   "runner": "github",
-  "items": 164,
-  "active": 164,
+  "items": 163,
+  "active": 163,
   "upcoming": 0,
-  "priced": 51,
+  "priced": 64,
   "ads": [
     {
-      "id": "book-2026-10-19",
+      "id": "book-2026-11-16",
       "name": "Member-Only Savings",
-      "valid_from": "2026-10-19",
-      "valid_to": "2026-11-15"
+      "valid_from": "2026-11-16",
+      "valid_to": "2026-12-20"
     }
   ],
   "last_error": null

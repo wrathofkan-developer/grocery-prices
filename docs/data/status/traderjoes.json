@@ -1,12 +1,12 @@
 {
   "chain": "traderjoes",
   "ok": true,
-  "at": "2026-11-15T08:52:58.535Z",
+  "at": "2026-11-16T09:41:42.011Z",
   "runner": "github",
-  "items": 1548,
-  "active": 1548,
+  "items": 1543,
+  "active": 1543,
   "upcoming": 0,
-  "priced": 1548,
+  "priced": 1543,
   "ads": [],
   "last_error": null
 }
