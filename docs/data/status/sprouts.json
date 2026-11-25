@@ -1,7 +1,7 @@
 {
   "chain": "sprouts",
   "ok": true,
-  "at": "2026-11-24T19:05:09.808Z",
+  "at": "2026-11-25T03:04:56.402Z",
   "runner": "windows",
   "items": 101,
   "active": 101,
@@ -18,7 +18,7 @@
       "id": "21493580972016312",
       "name": "Monthly Ad",
       "valid_from": "2026-10-27",
-      "valid_to": "2026-11-24"
+      "valid_to": "2026-12-01"
     }
   ],
   "last_error": null
