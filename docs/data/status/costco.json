@@ -1,10 +1,10 @@
 {
   "chain": "costco",
   "ok": true,
-  "at": "2026-11-25T18:37:24.891Z",
+  "at": "2026-11-26T17:41:01.342Z",
   "runner": "github",
-  "items": 163,
-  "active": 163,
+  "items": 164,
+  "active": 164,
   "upcoming": 0,
   "priced": 64,
   "ads": [
